@@ -32,7 +32,7 @@ module "step_function_notification_lambda" {
 
 module "step_function_notification_lambda_trigger" {
   #HC, 17th JUNE#### source = "../../lambda_trigger"
-  
+
   source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambda_trigger?ref=main"
 
   enable_lambda_trigger = var.setup_step_function_notification_lambda
