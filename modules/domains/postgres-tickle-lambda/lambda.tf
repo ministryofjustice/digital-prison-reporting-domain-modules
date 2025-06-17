@@ -2,7 +2,7 @@
 module "postgres_tickle_lambda" {
   #HC, 17th JUNE#### source = "../../lambdas/generic"
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambda_trigger?ref=main"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambdas/generic?ref=main"
 
 
   enable_lambda = var.setup_postgres_tickle_lambda
