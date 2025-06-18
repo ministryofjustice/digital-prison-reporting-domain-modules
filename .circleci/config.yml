@@ -1,0 +1,16 @@
+version: 2.1
+
+setup: true
+
+orbs:
+  reporting: ministryofjustice/hmpps-reporting@dev:0868d63f787c01fd48583626aa7348db7903dc8d
+
+workflows:
+  terraform-tag:
+    jobs:
+      - reporting/terraform_checks:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /^v.*/
