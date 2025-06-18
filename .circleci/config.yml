@@ -14,7 +14,3 @@ workflows:
               only: /.*/
             tags:
               only: /^v.*/
-          notify_slack: false
-          notify_jira: false
-
-
