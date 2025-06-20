@@ -9,5 +9,5 @@ variable "antivirus_trigger_bucket_arn" {
 
 variable "bucket_prefix" {
   description = "The prefix used in S3 buckets for this domain, i.e. the prefix used when ingesting data and in the raw, structured, curated, etc. zones"
-  type = string
+  type        = string
 }

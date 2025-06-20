@@ -75,12 +75,12 @@ variable "reserved_concurrent_executions" {
 
 variable "policies" {
   description = "Additional IAM policies to attach to the lambda's IAM role."
-  type = list(any)
-  default = []
+  type        = list(any)
+  default     = []
 }
 
 variable "tags" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "(Optional) Key-value map of resource tags."
 }
