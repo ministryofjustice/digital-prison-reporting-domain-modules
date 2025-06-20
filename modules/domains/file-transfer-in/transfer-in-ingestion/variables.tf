@@ -1,3 +1,9 @@
+variable "setup_transfer_in_ingestion" {
+  description = "Whether to setup the resources for Transfer in Ingestion"
+  type        = bool
+  default     = false
+}
+
 variable "antivirus_check_lambda_arn" {
   type = string
 }
