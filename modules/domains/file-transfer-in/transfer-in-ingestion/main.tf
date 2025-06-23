@@ -2,7 +2,7 @@
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   count = var.setup_transfer_in_ingestion ? 1 : 0
   # bucket = aws_s3_bucket.storage[0].id
-  bucket = var.antivirus_trigger_bucket_arn # Might need to be id
+  bucket = var.antivirus_trigger_bucket_name
 
   lambda_function {
     lambda_function_arn = var.antivirus_check_lambda_arn

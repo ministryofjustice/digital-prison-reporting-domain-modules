@@ -8,8 +8,8 @@ variable "antivirus_check_lambda_arn" {
   type = string
 }
 
-variable "antivirus_trigger_bucket_arn" {
-  description = "S3 Bucket ARN for the lambda trigger"
+variable "antivirus_trigger_bucket_name" {
+  description = "S3 Bucket name for the lambda trigger"
   type        = string
 }
 
