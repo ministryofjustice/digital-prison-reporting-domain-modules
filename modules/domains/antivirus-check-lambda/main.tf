@@ -11,7 +11,7 @@ module "landing_zone_antivirus_check_lambda" {
 
   memory_size                    = var.memory_size
   timeout                        = var.timeout
-  ephemeral_storage_size = var.ephemeral_storage_size # Can be increased up to 10240MB if required
+  ephemeral_storage_size         = var.ephemeral_storage_size # Can be increased up to 10240MB if required
   reserved_concurrent_executions = var.reserved_concurrent_executions
   log_retention_in_days          = var.log_retention_in_days
 
@@ -41,7 +41,7 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
 
   bucket = var.antivirus_trigger_bucket_name
 
-  dynamic lambda_function {
+  dynamic "lambda_function" {
     for_each = var.bucket_prefixes
     content {
       lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function_arn
