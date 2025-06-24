@@ -1,9 +1,6 @@
-# Lambda which is designed to ensure Postgres replication slots keep moving when there is no activity to read from that slot
+# Lambda that takes CSV files form the Landing Processing Zone, converts them to Parquet and moves them to the Raw Zone
 module "landing_zone_processing_lambda" {
-  #HC, 17th JUNE#### source = "../../lambdas/generic"
-
   source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambdas/generic?ref=main"
-
 
   enable_lambda = var.enable
   name          = var.name
