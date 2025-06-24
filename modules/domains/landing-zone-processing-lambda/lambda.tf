@@ -2,16 +2,17 @@
 module "landing_zone_processing_lambda" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambdas/generic?ref=main"
 
-  enable_lambda = var.enable
-  name          = var.name
-  s3_bucket     = var.lambda_code_s3_bucket
-  s3_key        = var.lambda_code_s3_key
-  handler       = var.lambda_handler
-  runtime       = var.lambda_runtime
-  policies      = var.policies
-  tracing       = var.lambda_tracing
-  timeout       = var.lambda_timeout_in_seconds
-  memory_size   = var.memory_size_mb
+  enable_lambda  = var.enable
+  name           = var.name
+  s3_bucket      = var.lambda_code_s3_bucket
+  s3_key         = var.lambda_code_s3_key
+  handler        = var.lambda_handler
+  runtime        = var.lambda_runtime
+  policies       = var.policies
+  tracing        = var.lambda_tracing
+  timeout        = var.lambda_timeout_in_seconds
+  memory_size    = var.memory_size_mb
+  lambda_trigger = true
 
   env_vars = {
     OUTPUT_BUCKET                 = var.output_bucket_name
