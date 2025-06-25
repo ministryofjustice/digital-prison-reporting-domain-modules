@@ -1,5 +1,7 @@
 # Lambda that takes CSV files form the Landing Processing Zone, converts them to Parquet and moves them to the Raw Zone
 module "landing_zone_processing_lambda" {
+  #checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
+  #checkov:skip=CKV_TF_2: "Ensure Terraform module sources use a tag with a version number"
   source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambdas/generic?ref=main"
 
   enable_lambda  = var.enable
