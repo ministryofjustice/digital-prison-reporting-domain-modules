@@ -8,11 +8,6 @@ variable "enable" {
   description = "Whether to enable the lambda related resources or not"
 }
 
-variable "trigger_bucket_arn" {
-  description = "Lambda Trigger S3 Bucket ARN"
-  type        = string
-}
-
 variable "ecr_repository_url" {
   description = "The URL of the ECR repository hosting the container image"
   type        = string
@@ -33,11 +28,6 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
-variable "antivirus_trigger_bucket_name" {
-  description = "S3 Bucket name for the lambda trigger"
-  type        = string
-}
-
 variable "output_bucket_name" {
   description = "The name of the bucket where files passing the antivirus check are moved to"
   type        = string
@@ -46,11 +36,6 @@ variable "output_bucket_name" {
 variable "quarantine_bucket_name" {
   description = "he name of the bucket where files failing the antivirus check are moved to"
   type        = string
-}
-
-variable "bucket_prefixes" {
-  description = "The prefixes in S3 that will trigger the antivirus lambda, i.e. the prefixes used when ingesting data and in the raw, structured, curated, etc. zones"
-  type        = list(string)
 }
 
 variable "log_retention_in_days" {

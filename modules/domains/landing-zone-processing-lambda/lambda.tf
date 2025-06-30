@@ -15,7 +15,6 @@ module "landing_zone_processing_lambda" {
   tracing        = var.lambda_tracing
   timeout        = var.lambda_timeout_in_seconds
   memory_size    = var.memory_size_mb
-  lambda_trigger = true
 
   env_vars = {
     OUTPUT_BUCKET                 = var.output_bucket_name

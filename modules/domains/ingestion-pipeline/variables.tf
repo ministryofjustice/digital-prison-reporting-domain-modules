@@ -5,6 +5,12 @@ variable "setup_data_ingestion_pipeline" {
   default     = false
 }
 
+variable "file_transfer_in" {
+  description = "Determines if the pipeline is for File Transfer In, True or False?"
+  type        = bool
+  default     = false
+}
+
 variable "batch_only" {
   description = "Determines if the pipeline is batch only, True or False?"
   type        = bool
@@ -31,6 +37,12 @@ variable "pipeline_dms_task_time_out" {
   description = "DMS Task Timeout"
   type        = number
   default     = 86400 # 24 hours
+}
+
+variable "pipeline_landing_lambda_time_out" {
+  description = "Landing Zone Lambda Tasks Timeout"
+  type        = number
+  default     = 1200 # 20 minutes
 }
 
 variable "step_function_execution_role_arn" {
@@ -75,6 +87,16 @@ variable "cdc_replication_task_id" {
 
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"
+  type        = string
+}
+
+variable "landing_zone_antivirus_check_lambda_function" {
+  description = "Landing Zone Antivirus Check Lambda Name"
+  type        = string
+}
+
+variable "landing_zone_processing_lambda_function" {
+  description = "Landing Zone Processing Lambda Name"
   type        = string
 }
 
@@ -133,6 +155,16 @@ variable "glue_reconciliation_job_num_workers" {
 
 variable "s3_glue_bucket_id" {
   description = "S3, Glue Bucket ID"
+  type        = string
+}
+
+variable "s3_landing_bucket_id" {
+  description = "S3, Landing Processing Bucket ID"
+  type        = string
+}
+
+variable "s3_landing_processing_bucket_id" {
+  description = "S3, Landing Processing Bucket ID"
   type        = string
 }
 
