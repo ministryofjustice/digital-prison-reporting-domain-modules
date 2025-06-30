@@ -142,7 +142,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_structured_and_curated_data: local.empty_raw_archive_structured_and_curated_data.StepName
+      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_structured_and_curated_data : local.empty_raw_archive_structured_and_curated_data.StepName
     }
   }
 
@@ -174,7 +174,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.file_transfer_in ? local.invoke_landing_zone_antivirus_check_lambda: local.start_dms_replication_task.StepName
+      "Next" : var.file_transfer_in ? local.invoke_landing_zone_antivirus_check_lambda : local.start_dms_replication_task.StepName
     }
   }
 
@@ -187,14 +187,14 @@ locals {
       "Parameters" : {
         "Payload" : {
           "stepFunctionToken.$" : "$$.Task.Token",
-          "Records": [ # We use this payload structure to be consistent with the structure used by S3 object notifications
+          "Records" : [ # We use this payload structure to be consistent with the structure used by S3 object notifications
             {
-              "s3": {
-                "bucket": {
-                  "name": var.s3_landing_bucket_id
+              "s3" : {
+                "bucket" : {
+                  "name" : var.s3_landing_bucket_id
                 },
-                "object": {
-                  "key": var.domain
+                "object" : {
+                  "key" : var.domain
                 }
               }
             }
@@ -230,14 +230,14 @@ locals {
       "Parameters" : {
         "Payload" : {
           "stepFunctionToken.$" : "$$.Task.Token",
-          "Records": [ # We use this payload structure to be consistent with the structure used by S3 object notifications
+          "Records" : [ # We use this payload structure to be consistent with the structure used by S3 object notifications
             {
-              "s3": {
-                "bucket": {
-                  "name": var.s3_landing_processing_bucket_id
+              "s3" : {
+                "bucket" : {
+                  "name" : var.s3_landing_processing_bucket_id
                 },
-                "object": {
-                  "key": var.domain
+                "object" : {
+                  "key" : var.domain
                 }
               }
             }
@@ -578,7 +578,7 @@ module "data_ingestion_pipeline" {
       (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
       (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
     }
-  }) : var.batch_only ? jsonencode(
+    }) : var.batch_only ? jsonencode(
     {
       "Comment" : "Data Ingestion Pipeline Step Function (Batch Only)",
       "StartAt" : local.stop_dms_replication_task.StepName,
