@@ -21,6 +21,7 @@ module "landing_zone_processing_lambda" {
     SCHEMA_REGISTRY_BUCKET        = var.schema_registry_bucket_name
     CHARSET                       = var.csv_charset
     NUMBER_OF_HEADER_ROWS_TO_SKIP = var.number_of_csv_header_rows_to_skip
+    LOG_CSV                       = var.log_csv
   }
 
   log_retention_in_days = var.lambda_log_retention_in_days

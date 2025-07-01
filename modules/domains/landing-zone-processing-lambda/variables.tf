@@ -40,6 +40,12 @@ variable "number_of_csv_header_rows_to_skip" {
   default     = 0
 }
 
+variable "log_csv" {
+  description = "Whether to log all lines of the CSV file during landing zone processing"
+  type        = bool
+  default     = false
+}
+
 variable "lambda_handler" {
   description = "Notification Lambda Handler"
   type        = string
