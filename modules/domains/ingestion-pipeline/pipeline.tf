@@ -182,7 +182,7 @@ locals {
     "StepName" : "Invoke Landing Zone Antivirus Check Lambda",
     "StepDefinition" : {
       "Type" : "Task",
-      "TimeoutSeconds" : var.pipeline_landing_lambda_time_out,
+      "TimeoutSeconds" : var.landing_zone_antivirus_check_lambda_timeout_in_seconds,
       "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
       "Parameters" : {
         "Payload" : {
@@ -225,7 +225,7 @@ locals {
     "StepName" : "Invoke Landing Zone Processing Lambda",
     "StepDefinition" : {
       "Type" : "Task",
-      "TimeoutSeconds" : var.pipeline_landing_lambda_time_out,
+      "TimeoutSeconds" : var.landing_zone_processing_lambda_timeout_in_seconds,
       "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
       "Parameters" : {
         "Payload" : {
