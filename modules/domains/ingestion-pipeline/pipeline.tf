@@ -142,7 +142,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_structured_and_curated_data : local.empty_raw_archive_structured_and_curated_data.StepName
+      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_structured_and_curated_data.StepName : local.empty_raw_archive_structured_and_curated_data.StepName
     }
   }
 
