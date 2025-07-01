@@ -174,7 +174,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.file_transfer_in ? local.invoke_landing_zone_antivirus_check_lambda : local.start_dms_replication_task.StepName
+      "Next" : var.file_transfer_in ? local.invoke_landing_zone_antivirus_check_lambda.StepName : local.start_dms_replication_task.StepName
     }
   }
 
