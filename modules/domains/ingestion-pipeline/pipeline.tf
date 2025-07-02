@@ -194,7 +194,7 @@ locals {
                   "name" : var.s3_landing_bucket_id
                 },
                 "object" : {
-                  "key" : var.domain
+                  "key" : var.domain_s3_prefix
                 }
               }
             }
@@ -237,7 +237,7 @@ locals {
                   "name" : var.s3_landing_processing_bucket_id
                 },
                 "object" : {
-                  "key" : var.domain
+                  "key" : var.domain_s3_prefix
                 }
               }
             }

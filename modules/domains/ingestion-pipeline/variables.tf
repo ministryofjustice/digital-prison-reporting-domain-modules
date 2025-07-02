@@ -372,3 +372,8 @@ variable "domain" {
   type        = string
   description = "Domain Name"
 }
+
+variable "domain_s3_prefix" {
+  type        = string
+  description = "The prefix used by the Domain in S3"
+}
