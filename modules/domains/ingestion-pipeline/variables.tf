@@ -42,13 +42,13 @@ variable "pipeline_dms_task_time_out" {
 variable "landing_zone_antivirus_check_lambda_timeout_in_seconds" {
   description = "Timeout for the Landing Zone Antivirus Check Lambda in seconds"
   type        = number
-  default     = 1200 # 20 minutes
+  default     = 900 # 15 minutes
 }
 
 variable "landing_zone_processing_lambda_timeout_in_seconds" {
   description = "Landing zone processing Lambda timeout in seconds."
   type        = number
-  default     = 1200 # 20 minutes
+  default     = 900 # 15 minutes
 }
 
 variable "step_function_execution_role_arn" {
