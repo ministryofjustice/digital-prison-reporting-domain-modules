@@ -19,6 +19,8 @@ module "landing_zone_processing_lambda" {
   env_vars = {
     OUTPUT_BUCKET                 = var.output_bucket_name
     SCHEMA_REGISTRY_BUCKET        = var.schema_registry_bucket_name
+    VIOLATIONS_BUCKET             = var.violations_bucket_name
+    VIOLATIONS_PATH               = var.violations_path
     CHARSET                       = var.csv_charset
     NUMBER_OF_HEADER_ROWS_TO_SKIP = var.number_of_csv_header_rows_to_skip
     LOG_CSV                       = var.log_csv
