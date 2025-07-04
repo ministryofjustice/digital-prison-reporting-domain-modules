@@ -9,6 +9,11 @@ variable "file_transfer_in" {
   description = "Determines if the pipeline is for File Transfer In, True or False?"
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.file_transfer_in ? var.batch_only : true
+    error_message = "File Transfer In pipeline can only be created when batch_only = true"
+  }
 }
 
 variable "batch_only" {
