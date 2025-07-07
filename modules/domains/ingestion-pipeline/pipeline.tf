@@ -199,8 +199,6 @@ locals {
               }
             }
           ],
-          "ignoreDmsTaskFailure" : var.pipeline_notification_lambda_function_ignore_dms_failure,
-          "replicationTaskArn" : var.dms_replication_task_arn
         },
         "FunctionName" : var.landing_zone_antivirus_check_lambda_function
       },
