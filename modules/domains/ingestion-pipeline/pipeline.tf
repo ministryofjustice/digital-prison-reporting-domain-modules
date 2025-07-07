@@ -142,7 +142,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.empty_raw_archive_structured_and_curated_data.StepName
+      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_structured_and_curated_data.StepName : local.empty_raw_archive_structured_and_curated_data.StepName
     }
   }
 
@@ -159,6 +159,104 @@ locals {
         }
       },
       "Next" : local.start_dms_replication_task.StepName
+    }
+  }
+
+  empty_landing_processing_raw_archive_structured_and_curated_data = {
+    "StepName" : "Empty Landing Processing, Raw, Archive, Structured and Curated Data",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters" : {
+        "JobName" : var.glue_s3_data_deletion_job,
+        "Arguments" : {
+          "--dpr.file.deletion.buckets" : "${var.s3_landing_processing_bucket_id},${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+          "--dpr.config.key" : var.domain
+        }
+      },
+      "Next" : var.file_transfer_in ? local.invoke_landing_zone_antivirus_check_lambda.StepName : local.start_dms_replication_task.StepName
+    }
+  }
+
+  invoke_landing_zone_antivirus_check_lambda = {
+    "StepName" : "Invoke Landing Zone Antivirus Check Lambda",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "TimeoutSeconds" : var.landing_zone_antivirus_check_lambda_timeout_in_seconds,
+      "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters" : {
+        "Payload" : {
+          "stepFunctionToken.$" : "$$.Task.Token",
+          "Records" : [ # We use this payload structure to be consistent with the structure used by S3 object notifications
+            {
+              "s3" : {
+                "bucket" : {
+                  "name" : var.s3_landing_bucket_id
+                },
+                "object" : {
+                  "key" : var.domain_s3_prefix
+                }
+              }
+            }
+          ]
+        },
+        "FunctionName" : var.landing_zone_antivirus_check_lambda_function
+      },
+      "Retry" : [
+        {
+          "ErrorEquals" : [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds" : 60,
+          "MaxAttempts" : 2,
+          "BackoffRate" : 2
+        }
+      ],
+      "Next" : local.invoke_landing_zone_processing_lambda.StepName
+    }
+  }
+
+  invoke_landing_zone_processing_lambda = {
+    "StepName" : "Invoke Landing Zone Processing Lambda",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "TimeoutSeconds" : var.landing_zone_processing_lambda_timeout_in_seconds,
+      "Resource" : "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters" : {
+        "Payload" : {
+          "stepFunctionToken.$" : "$$.Task.Token",
+          "Records" : [ # We use this payload structure to be consistent with the structure used by S3 object notifications
+            {
+              "s3" : {
+                "bucket" : {
+                  "name" : var.s3_landing_processing_bucket_id
+                },
+                "object" : {
+                  "key" : var.domain_s3_prefix
+                }
+              }
+            }
+          ]
+        },
+        "FunctionName" : var.landing_zone_processing_lambda_function
+      },
+      "Retry" : [
+        {
+          "ErrorEquals" : [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds" : 60,
+          "MaxAttempts" : 2,
+          "BackoffRate" : 2
+        }
+      ],
+      "Next" : local.run_glue_batch_job.StepName
     }
   }
 
@@ -333,7 +431,7 @@ locals {
         "NumberOfWorkers" : var.retention_curated_num_workers,
         "WorkerType" : var.retention_curated_worker_type
       },
-      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName
+      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
     }
   }
 
@@ -457,7 +555,27 @@ module "data_ingestion_pipeline" {
 
   step_function_execution_role_arn = var.step_function_execution_role_arn
 
-  definition = var.batch_only ? jsonencode(
+  definition = var.file_transfer_in ? jsonencode({
+    "Comment" : "Data Ingestion Pipeline Step Function (File Transfer In Batch Only)",
+    "StartAt" : local.update_hive_tables.StepName,
+    "States" : {
+      (local.update_hive_tables.StepName) : local.update_hive_tables.StepDefinition,
+      (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
+      (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
+      (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+      (local.empty_landing_processing_raw_archive_structured_and_curated_data.StepName) : local.empty_landing_processing_raw_archive_structured_and_curated_data.StepDefinition,
+      (local.invoke_landing_zone_antivirus_check_lambda.StepName) : local.invoke_landing_zone_antivirus_check_lambda.StepDefinition,
+      (local.invoke_landing_zone_processing_lambda.StepName) : local.invoke_landing_zone_processing_lambda.StepDefinition,
+      (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
+      (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
+      (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
+      (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
+      (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
+      (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+      (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+      (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
+    }
+    }) : var.batch_only ? jsonencode(
     {
       "Comment" : "Data Ingestion Pipeline Step Function (Batch Only)",
       "StartAt" : local.stop_dms_replication_task.StepName,

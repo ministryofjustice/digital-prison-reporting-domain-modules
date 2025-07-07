@@ -5,6 +5,17 @@ variable "setup_data_ingestion_pipeline" {
   default     = false
 }
 
+variable "file_transfer_in" {
+  description = "Determines if the pipeline is for File Transfer In, True or False?"
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = var.file_transfer_in ? var.batch_only : true
+    error_message = "File Transfer In pipeline can only be created when batch_only = true"
+  }
+}
+
 variable "batch_only" {
   description = "Determines if the pipeline is batch only, True or False?"
   type        = bool
@@ -31,6 +42,18 @@ variable "pipeline_dms_task_time_out" {
   description = "DMS Task Timeout"
   type        = number
   default     = 86400 # 24 hours
+}
+
+variable "landing_zone_antivirus_check_lambda_timeout_in_seconds" {
+  description = "Timeout for the Landing Zone Antivirus Check Lambda in seconds"
+  type        = number
+  default     = 900 # 15 minutes
+}
+
+variable "landing_zone_processing_lambda_timeout_in_seconds" {
+  description = "Landing zone processing Lambda timeout in seconds."
+  type        = number
+  default     = 900 # 15 minutes
 }
 
 variable "step_function_execution_role_arn" {
@@ -75,6 +98,16 @@ variable "cdc_replication_task_id" {
 
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"
+  type        = string
+}
+
+variable "landing_zone_antivirus_check_lambda_function" {
+  description = "Landing Zone Antivirus Check Lambda Name"
+  type        = string
+}
+
+variable "landing_zone_processing_lambda_function" {
+  description = "Landing Zone Processing Lambda Name"
   type        = string
 }
 
@@ -133,6 +166,16 @@ variable "glue_reconciliation_job_num_workers" {
 
 variable "s3_glue_bucket_id" {
   description = "S3, Glue Bucket ID"
+  type        = string
+}
+
+variable "s3_landing_bucket_id" {
+  description = "S3, Landing Processing Bucket ID"
+  type        = string
+}
+
+variable "s3_landing_processing_bucket_id" {
+  description = "S3, Landing Processing Bucket ID"
   type        = string
 }
 
@@ -333,4 +376,9 @@ variable "tags" {
 variable "domain" {
   type        = string
   description = "Domain Name"
+}
+
+variable "domain_s3_prefix" {
+  type        = string
+  description = "The prefix used by the Domain in S3"
 }

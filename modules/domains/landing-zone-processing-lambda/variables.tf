@@ -28,6 +28,16 @@ variable "schema_registry_bucket_name" {
   type        = string
 }
 
+variable "violations_bucket_name" {
+  description = "The name of the bucket where files are moved to when they are classified as violations"
+  type        = string
+}
+
+variable "violations_path" {
+  description = "The path in the violations bucket where violations files are moved to, i.e. the prefix in the violations bucket where files classed as violations are moved to"
+  type        = string
+}
+
 variable "csv_charset" {
   description = "The charset of the input CSV files"
   type        = string
@@ -38,6 +48,12 @@ variable "number_of_csv_header_rows_to_skip" {
   description = "The number of rows to skip at the start of the CSV file, e.g. 1 to skip a 1 line header"
   type        = number
   default     = 0
+}
+
+variable "log_csv" {
+  description = "Whether to log all lines of the CSV file during landing zone processing"
+  type        = bool
+  default     = false
 }
 
 variable "lambda_handler" {
