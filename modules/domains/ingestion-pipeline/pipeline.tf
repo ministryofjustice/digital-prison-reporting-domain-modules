@@ -198,7 +198,7 @@ locals {
                 }
               }
             }
-          ],
+          ]
         },
         "FunctionName" : var.landing_zone_antivirus_check_lambda_function
       },
@@ -239,7 +239,7 @@ locals {
                 }
               }
             }
-          ],
+          ]
         },
         "FunctionName" : var.landing_zone_processing_lambda_function
       },
