@@ -715,7 +715,7 @@ module "reload_pipeline" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
-  ) : var.batch_only ? jsonencode(
+    ) : var.batch_only ? jsonencode(
     {
       "Comment" : "Reload Pipeline Step Function (Batch Only)",
       "StartAt" : local.stop_dms_replication_task.StepName,
