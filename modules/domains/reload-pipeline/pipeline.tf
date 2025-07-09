@@ -563,7 +563,7 @@ locals {
         "NumberOfWorkers" : var.retention_curated_num_workers,
         "WorkerType" : var.retention_curated_worker_type
       },
-      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName
+      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
     }
   }
 
@@ -710,7 +710,6 @@ module "reload_pipeline" {
         (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
         (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
         (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
-        (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
