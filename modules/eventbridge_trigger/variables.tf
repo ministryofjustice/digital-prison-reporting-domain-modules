@@ -40,7 +40,7 @@ variable "schedule_expression" {
 variable "schedule_expression_timezone" {
   type        = string
   description = "Schedule expression time zone for the eventbridge trigger"
-  default     = "Europe/London"
+  default     = "UTC"
 }
 
 variable "arn" {
