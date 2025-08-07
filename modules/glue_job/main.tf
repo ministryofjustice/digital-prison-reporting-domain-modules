@@ -108,8 +108,8 @@ resource "aws_iam_policy" "additional-policy" {
           ]
           Effect = "Allow"
           Resource = [
-            "arn:aws:s3:::dpr-*/*",
-            "arn:aws:s3:::dpr-*",
+            "arn:aws:s3:::${var.project_id}-*/*",
+            "arn:aws:s3:::${var.project_id}-*",
           ]
         },
         {
@@ -142,7 +142,7 @@ resource "aws_iam_policy" "additional-policy" {
             "dms:DescribeReplicationTasks",
           ]
           Effect   = "Allow"
-          Resource = "arn:aws:dms:eu-west-2:972272129531:*:*"
+          Resource = "arn:aws:dms:${var.region}:${var.account}:*:*"
         },
         {
           Action = [
@@ -154,7 +154,7 @@ resource "aws_iam_policy" "additional-policy" {
             "kinesis:DescribeLimits",
           ]
           Effect   = "Allow"
-          Resource = "arn:aws:kinesis:eu-west-2:972272129531:stream/dpr-*"
+          Resource = "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
         },
         {
           Action = [
@@ -162,10 +162,10 @@ resource "aws_iam_policy" "additional-policy" {
             "secretsmanager:DescribeSecret",
           ]
           Effect = "Allow"
-          Resource = [
-            "arn:aws:secretsmanager:eu-west-2:972272129531:secret:external/dpr-dps-*",
-            "arn:aws:secretsmanager:eu-west-2:972272129531:secret:dpr-redshift-secret-*",
-          ]
+          Resource = concat(var.additional_secret_arns, [
+            "arn:aws:secretsmanager:${var.region}:${var.account}:secret:external/${var.project_id}-dps-*",
+            "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*",
+          ])
         },
         {
           Action = [
@@ -176,7 +176,7 @@ resource "aws_iam_policy" "additional-policy" {
             "kms:Decrypt*",
           ]
           Effect   = "Allow"
-          Resource = "arn:aws:kms:*:972272129531:key/*"
+          Resource = "arn:aws:kms:*:${var.account}:key/*"
         },
         {
           Action = [
@@ -193,7 +193,7 @@ resource "aws_iam_policy" "additional-policy" {
             "dynamodb:BatchGet*",
           ]
           Effect   = "Allow"
-          Resource = "arn:aws:dynamodb:eu-west-2:972272129531:table/dpr-*"
+          Resource = "arn:aws:dynamodb:${var.region}:${var.account}:table/dpr-*"
         },
       ]
       Version = "2012-10-17"
