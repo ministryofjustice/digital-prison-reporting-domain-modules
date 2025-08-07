@@ -84,124 +84,123 @@ resource "aws_iam_role" "glue-service-role" {
 EOF
 }
 
-data "aws_iam_policy_document" "extra-policy-document" {
+resource "aws_iam_policy" "additional-policy" {
   #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions. TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
   #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
   #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   #checkov:skip=CKV_AWS_110: "Ensure IAM policies does not allow privilege escalation"
 
-  statement {
-    actions = [
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetObjectAcl",
-      "s3:GetObject",
-      "s3:GetBucketLocation",
-      "s3:DeleteObject",
-    ]
-    resources = [
-      "arn:aws:s3:::${var.project_id}-*/*",
-      "arn:aws:s3:::${var.project_id}-*"
-    ]
-  }
-  # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
-  statement {
-    actions = [
-      "logs:PutLogEvents",
-      "logs:CreateLogStream",
-      "logs:CreateLogGroup",
-      "logs:AssociateKmsKey",
-    ]
-    resources = [
-      "arn:aws:logs:*:*:/aws-glue/*"
-    ]
-  }
-  statement {
-    actions = [
-      "sqs:*", # Needs Fixing
-      "iam:ListRolePolicies",
-      "iam:GetRolePolicy",
-      "iam:GetRole",
-      "glue:*",
-      "cloudwatch:PutMetricData",
-    ]
-    resources = [
-      "*"
-    ]
-  }
-  statement {
-    actions = [
-      "dms:StopReplicationTask",
-      "dms:ModifyReplicationTask",
-      "dms:DescribeTableStatistics",
-      "dms:DescribeReplicationTasks",
-    ]
-    resources = [
-      "arn:aws:dms:${var.region}:${var.account}:*:*"
-    ]
-  }
-  statement {
-    actions = [
-      "kinesis:SubscribeToShard",
-      "kinesis:ListShards",
-      "kinesis:GetShardIterator",
-      "kinesis:GetRecords",
-      "kinesis:DescribeStream",
-      "kinesis:DescribeLimits",
-    ]
-    resources = [
-      "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
-    ]
-  }
-  statement {
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret",
-    ]
-    resources = concat(var.additional_secret_arns, [
-      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:external/${var.project_id}-dps-*",
-      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*",
-    ])
-  }
-  statement {
-    actions = [
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt*",
-      "kms:DescribeKey",
-      "kms:Decrypt*",
-    ]
-    resources = [
-      "arn:aws:kms:*:${var.account}:key/*"
-    ]
-  }
-  statement {
-    actions = [
-      "dynamodb:Update*",
-      "dynamodb:Scan",
-      "dynamodb:Query",
-      "dynamodb:PutItem",
-      "dynamodb:Get*",
-      "dynamodb:DescribeTable",
-      "dynamodb:DescribeStream",
-      "dynamodb:Delete*",
-      "dynamodb:CreateTable",
-      "dynamodb:BatchWrite*",
-      "dynamodb:BatchGet*",
-    ]
-    resources = [
-      "arn:aws:dynamodb:${var.region}:${var.account}:table/dpr-*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "additional-policy" {
   count = var.create_role && var.create_job ? 1 : 0
 
   name        = "${var.name}-policy"
   description = "Extra Policy for AWS Glue Job"
-  policy      = data.aws_iam_policy_document.extra-policy-document.json
-  tags        = var.tags
+  policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action = [
+            "s3:PutObject",
+            "s3:ListBucket",
+            "s3:GetObjectAcl",
+            "s3:GetObject",
+            "s3:GetBucketLocation",
+            "s3:DeleteObject",
+          ]
+          Effect = "Allow"
+          Resource = [
+            "arn:aws:s3:::dpr-*/*",
+            "arn:aws:s3:::dpr-*",
+          ]
+        },
+        {
+          Action = [
+            "logs:PutLogEvents",
+            "logs:CreateLogStream",
+            "logs:CreateLogGroup",
+            "logs:AssociateKmsKey",
+          ]
+          Effect   = "Allow"
+          Resource = "arn:aws:logs:*:*:/aws-glue/*"
+        },
+        {
+          Action = [
+            "sqs:*",
+            "iam:ListRolePolicies",
+            "iam:GetRolePolicy",
+            "iam:GetRole",
+            "glue:*",
+            "cloudwatch:PutMetricData",
+          ]
+          Effect   = "Allow"
+          Resource = "*"
+        },
+        {
+          Action = [
+            "dms:StopReplicationTask",
+            "dms:ModifyReplicationTask",
+            "dms:DescribeTableStatistics",
+            "dms:DescribeReplicationTasks",
+          ]
+          Effect   = "Allow"
+          Resource = "arn:aws:dms:eu-west-2:972272129531:*:*"
+        },
+        {
+          Action = [
+            "kinesis:SubscribeToShard",
+            "kinesis:ListShards",
+            "kinesis:GetShardIterator",
+            "kinesis:GetRecords",
+            "kinesis:DescribeStream",
+            "kinesis:DescribeLimits",
+          ]
+          Effect   = "Allow"
+          Resource = "arn:aws:kinesis:eu-west-2:972272129531:stream/dpr-*"
+        },
+        {
+          Action = [
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:DescribeSecret",
+          ]
+          Effect = "Allow"
+          Resource = [
+            "arn:aws:secretsmanager:eu-west-2:972272129531:secret:external/dpr-dps-*",
+            "arn:aws:secretsmanager:eu-west-2:972272129531:secret:dpr-redshift-secret-*",
+          ]
+        },
+        {
+          Action = [
+            "kms:ReEncrypt*",
+            "kms:GenerateDataKey*",
+            "kms:Encrypt*",
+            "kms:DescribeKey",
+            "kms:Decrypt*",
+          ]
+          Effect   = "Allow"
+          Resource = "arn:aws:kms:*:972272129531:key/*"
+        },
+        {
+          Action = [
+            "dynamodb:Update*",
+            "dynamodb:Scan",
+            "dynamodb:Query",
+            "dynamodb:PutItem",
+            "dynamodb:Get*",
+            "dynamodb:DescribeTable",
+            "dynamodb:DescribeStream",
+            "dynamodb:Delete*",
+            "dynamodb:CreateTable",
+            "dynamodb:BatchWrite*",
+            "dynamodb:BatchGet*",
+          ]
+          Effect   = "Allow"
+          Resource = "arn:aws:dynamodb:eu-west-2:972272129531:table/dpr-*"
+        },
+      ]
+      Version = "2012-10-17"
+    }
+  )
+
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
