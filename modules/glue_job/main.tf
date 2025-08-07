@@ -94,7 +94,7 @@ resource "aws_iam_policy" "additional-policy" {
 
   name        = "${var.name}-policy"
   description = "Extra Policy for AWS Glue Job"
-  policy      = jsonencode(
+  policy = jsonencode(
     {
       Statement = [
         {
@@ -106,7 +106,7 @@ resource "aws_iam_policy" "additional-policy" {
             "s3:GetBucketLocation",
             "s3:DeleteObject",
           ]
-          Effect   = "Allow"
+          Effect = "Allow"
           Resource = [
             "arn:aws:s3:::dpr-*/*",
             "arn:aws:s3:::dpr-*",
@@ -161,7 +161,7 @@ resource "aws_iam_policy" "additional-policy" {
             "secretsmanager:GetSecretValue",
             "secretsmanager:DescribeSecret",
           ]
-          Effect   = "Allow"
+          Effect = "Allow"
           Resource = [
             "arn:aws:secretsmanager:eu-west-2:972272129531:secret:external/dpr-dps-*",
             "arn:aws:secretsmanager:eu-west-2:972272129531:secret:dpr-redshift-secret-*",
@@ -200,7 +200,7 @@ resource "aws_iam_policy" "additional-policy" {
     }
   )
 
-  tags        = var.tags
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
