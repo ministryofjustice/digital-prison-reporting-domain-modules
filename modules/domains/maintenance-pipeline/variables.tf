@@ -99,7 +99,7 @@ variable "compaction_structured_worker_type" {
 variable "compaction_structured_num_workers" {
   description = "(Optional) Number of workers to use for the compaction job in structured zone. Must be >= 2"
   type        = number
-  default     = 2
+  default     = 3
 
   validation {
     condition     = var.compaction_structured_num_workers >= 2
@@ -121,7 +121,7 @@ variable "compaction_curated_worker_type" {
 variable "compaction_curated_num_workers" {
   description = "(Optional) Number of workers to use for the compaction job in curated zone. Must be >= 2"
   type        = number
-  default     = 2
+  default     = 3
 
   validation {
     condition     = var.compaction_curated_num_workers >= 2
@@ -143,7 +143,7 @@ variable "retention_structured_worker_type" {
 variable "retention_structured_num_workers" {
   description = "(Optional) Number of workers to use for the retention job in structured zone. Must be >= 2"
   type        = number
-  default     = 2
+  default     = 3
 
   validation {
     condition     = var.retention_structured_num_workers >= 2
@@ -165,7 +165,7 @@ variable "retention_curated_worker_type" {
 variable "retention_curated_num_workers" {
   description = "(Optional) Number of workers to use for the retention job in curated zone. Must be >= 2"
   type        = number
-  default     = 2
+  default     = 3
 
   validation {
     condition     = var.retention_curated_num_workers >= 2
