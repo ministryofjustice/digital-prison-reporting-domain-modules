@@ -106,7 +106,7 @@ resource "aws_dms_replication_task" "dms-replication" {
   replication_task_id       = "${var.name}-task-${var.env}"
   source_endpoint_arn       = var.dms_source_endpoint # aws_dms_endpoint.dms-s3-target-source[0].endpoint_arn
   target_endpoint_arn       = var.dms_target_endpoint # aws_dms_s3_endpoint.dms-s3-target-endpoint[0].endpoint_arn
-  table_mappings            = data.template_file.table-mappings.rendered
+  table_mappings            = replace(data.template_file.table-mappings.rendered, "\\s", "")
   replication_task_settings = var.replication_task_settings #JSON
 
   tags = merge(
