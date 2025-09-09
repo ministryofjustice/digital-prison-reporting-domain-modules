@@ -666,8 +666,8 @@ variable "glue_archive_backfill_job_num_workers" {
 }
 
 variable "glue_archive_backfill_job_max_concurrent" {
-  type    = number
-  default = 1
+  type        = number
+  default     = 1
   description = "(Optional) The number of concurrent executions of the archive backfill job"
 }
 

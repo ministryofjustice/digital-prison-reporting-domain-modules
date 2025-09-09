@@ -187,7 +187,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
-  ) : var.split_pipeline ? jsonencode(
+    ) : var.split_pipeline ? jsonencode(
     {
       "Comment" : "Reload With Archive Backfill Pipeline Step Function (With Separated Full-Load and CDC Tasks)",
       "StartAt" : local.deactivate_archive_trigger.StepName,
@@ -224,7 +224,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
-  ) : jsonencode(
+    ) : jsonencode(
     {
       "Comment" : "Reload With Archive Backfill Pipeline Step Function",
       "StartAt" : local.deactivate_archive_trigger.StepName,
