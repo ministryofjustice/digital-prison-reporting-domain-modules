@@ -115,6 +115,11 @@ variable "glue_s3_data_deletion_job" {
   type        = string
 }
 
+variable "archive_backfill_job" {
+  description = "Name of glue job which backfills the archive data"
+  type        = string
+}
+
 variable "dms_replication_task_arn" {
   description = "ARN of the replication task"
   type        = string
@@ -401,6 +406,18 @@ variable "reload_diff_folder" {
   type        = string
   default     = "diffs"
   description = "Folder for the reload diff"
+}
+
+variable "archive_backfill_folder" {
+  type        = string
+  default     = "backfilled-archive"
+  description = "Folder for the reload diff"
+}
+
+variable "enable_archive_backfill" {
+  type        = bool
+  default     = false
+  description = "Boolean flag to backfill the archive before computing the reload diff during the reload process"
 }
 
 variable "domain_s3_prefix" {
