@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  reporting: ministryofjustice/hmpps-reporting@dev:9560bf68cd5dde78a58b29caeaa54e944946bb2e
+  reporting: ministryofjustice/hmpps-reporting@dev:970b1098477733069fe5510ea588684e192010ee
 
 workflows:
   terraform-tag:
