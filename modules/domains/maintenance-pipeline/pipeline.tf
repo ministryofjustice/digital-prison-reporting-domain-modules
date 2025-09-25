@@ -11,8 +11,31 @@ module "maintenance_pipeline" {
   definition = jsonencode(
     {
       "Comment" : "Maintenance Pipeline Step Function",
-      "StartAt" : "Stop DMS Replication Task",
+      "StartAt" : "Deactivate Archive Trigger",
       "States" : {
+        "Deactivate Archive Trigger" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_trigger_activation_job,
+            "Arguments" : {
+              "--dpr.glue.trigger.name" : var.archive_job_trigger_name,
+              "--dpr.glue.trigger.activate" : "false"
+            }
+          },
+          "Next" : "Stop Archive Job"
+        },
+        "Stop Archive Job" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_stop_glue_instance_job,
+            "Arguments" : {
+              "--dpr.stop.glue.instance.job.name" : var.glue_archive_job
+            }
+          },
+          "Next" : "Stop DMS Replication Task"
+        },
         "Stop DMS Replication Task" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
@@ -138,6 +161,18 @@ module "maintenance_pipeline" {
             "Arguments" : {
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Reactivate Archive Trigger"
+        },
+        "Reactivate Archive Trigger" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_trigger_activation_job,
+            "Arguments" : {
+              "--dpr.glue.trigger.name" : var.archive_job_trigger_name,
+              "--dpr.glue.trigger.activate" : "true"
             }
           },
           "End" : true

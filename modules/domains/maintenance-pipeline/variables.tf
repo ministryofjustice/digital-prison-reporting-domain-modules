@@ -85,6 +85,16 @@ variable "glue_archive_job" {
   type        = string
 }
 
+variable "glue_trigger_activation_job" {
+  description = "Name of job to which activates/deactivates a glue trigger"
+  type        = string
+}
+
+variable "archive_job_trigger_name" {
+  description = "Name of the trigger for a glue trigger"
+  type        = string
+}
+
 variable "compaction_structured_worker_type" {
   description = "(Optional) Worker type to use for the compaction job in structured zone"
   type        = string
