@@ -2,21 +2,22 @@
 module "postgres_tickle_lambda" {
   #HC, 17th JUNE#### source = "../../lambdas/generic"
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambdas/generic?ref=main"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/digital-prison-reporting/modules/lambdas/generic?ref=DHS-182"
 
 
-  enable_lambda = var.setup_postgres_tickle_lambda
-  name          = var.postgres_tickle_lambda_name
-  s3_bucket     = var.lambda_code_s3_bucket
-  s3_key        = var.lambda_code_s3_key
-  handler       = var.lambda_handler
-  runtime       = var.lambda_runtime
-  policies      = var.lambda_policies
-  tracing       = var.lambda_tracing
-  timeout       = var.lambda_timeout_in_seconds
-  memory_size   = var.memory_size
-  env_vars      = var.env_vars
-  secret_arns   = var.secret_arns
+  enable_lambda             = var.setup_postgres_tickle_lambda
+  skip_destroy_of_log_group = var.skip_destroy_of_log_group
+  name                      = var.postgres_tickle_lambda_name
+  s3_bucket                 = var.lambda_code_s3_bucket
+  s3_key                    = var.lambda_code_s3_key
+  handler                   = var.lambda_handler
+  runtime                   = var.lambda_runtime
+  policies                  = var.lambda_policies
+  tracing                   = var.lambda_tracing
+  timeout                   = var.lambda_timeout_in_seconds
+  memory_size               = var.memory_size
+  env_vars                  = var.env_vars
+  secret_arns               = var.secret_arns
 
   log_retention_in_days = var.lambda_log_retention_in_days
 

@@ -5,6 +5,12 @@ variable "setup_postgres_tickle_lambda" {
   default     = false
 }
 
+variable "skip_destroy_of_log_group" {
+  description = "Skip destroying of the cloudwatch logs when the lambda is destroyed"
+  type        = bool
+  default     = false
+}
+
 variable "postgres_tickle_lambda_name" {
   description = "Name for the Lambda"
   type        = string
