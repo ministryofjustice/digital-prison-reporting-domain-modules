@@ -271,6 +271,16 @@ variable "glue_s3_retry_max_wait_millis" {
   type        = number
 }
 
+variable "file_transfer_use_default_parallelism" {
+  description = "Boolean flag to use number of default parallelism (i.e cores - 1) when transferring files"
+  type        = bool
+}
+
+variable "file_transfer_parallelism" {
+  description = "Specifies the number of threads to use for transferring files in parallel"
+  type        = number
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}
