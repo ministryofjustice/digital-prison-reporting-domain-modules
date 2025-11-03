@@ -33,6 +33,12 @@ variable "glue_batch_job_short_name" {
   type        = string
 }
 
+variable "glue_batch_job_glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_batch_description" {
   description = "Job Description"
   default     = ""
@@ -176,6 +182,12 @@ variable "glue_cdc_job_short_name" {
   description = "Name of the Glue CDC Job"
   default     = ""
   type        = string
+}
+
+variable "glue_cdc_job_glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
 }
 
 variable "glue_cdc_description" {
@@ -324,6 +336,12 @@ variable "glue_unprocessed_raw_files_check_job_short_name" {
   type        = string
 }
 
+variable "glue_unprocessed_raw_files_check_job_glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_unprocessed_raw_files_check_description" {
   description = "Job Description"
   default     = ""
@@ -464,6 +482,12 @@ variable "glue_archive_job_short_name" {
   type        = string
 }
 
+variable "glue_archive_job_glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_archive_description" {
   description = "Job Description"
   default     = ""
@@ -596,6 +620,12 @@ variable "glue_archive_backfill_job_short_name" {
   type        = string
 }
 
+variable "glue_archive_backfill_job_glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_archive_backfill_job_description" {
   description = "Description for the archive backfill job"
   type        = string
@@ -699,6 +729,12 @@ variable "glue_create_reload_diff_job_short_name" {
   description = "Short name of the Glue Create Reload Diff Job"
   default     = ""
   type        = string
+}
+
+variable "glue_create_reload_diff_job_glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
 }
 
 variable "glue_create_reload_diff_job_description" {
