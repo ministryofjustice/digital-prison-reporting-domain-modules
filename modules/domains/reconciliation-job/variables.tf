@@ -46,6 +46,12 @@ variable "short_name" {
   type        = string
 }
 
+variable "glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "create_sec_conf" {
   type        = bool
   default     = false
