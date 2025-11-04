@@ -684,6 +684,7 @@ locals {
       "Parameters" : {
         "JobName" : var.glue_reporting_hub_cdc_jobname,
         "Arguments" : {
+          "--dpr.clean.cdc.checkpoint" : "true",
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.config.key" : var.domain
         }
