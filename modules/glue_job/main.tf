@@ -146,18 +146,6 @@ resource "aws_iam_policy" "additional-policy" {
         },
         {
           Action = [
-            "kinesis:SubscribeToShard",
-            "kinesis:ListShards",
-            "kinesis:GetShardIterator",
-            "kinesis:GetRecords",
-            "kinesis:DescribeStream",
-            "kinesis:DescribeLimits",
-          ]
-          Effect   = "Allow"
-          Resource = "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
-        },
-        {
-          Action = [
             "secretsmanager:GetSecretValue",
             "secretsmanager:DescribeSecret",
           ]
