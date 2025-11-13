@@ -14,7 +14,6 @@ module "glue_reporting_hub_cdc_job" {
   temp_dir                      = var.glue_cdc_temp_dir
   spark_event_logs              = var.glue_cdc_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_cdc_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_cdc_execution_class
@@ -56,7 +55,6 @@ module "glue_reporting_hub_batch_job" {
   temp_dir                      = var.glue_batch_temp_dir
   spark_event_logs              = var.glue_batch_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_batch_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_batch_execution_class
@@ -96,7 +94,6 @@ module "unprocessed_raw_files_check_job" {
   temp_dir                      = var.glue_unprocessed_raw_files_check_temp_dir
   spark_event_logs              = var.glue_unprocessed_raw_files_check_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_unprocessed_raw_files_check_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_unprocessed_raw_files_check_execution_class
@@ -136,7 +133,6 @@ module "glue_archive_job" {
   temp_dir                      = var.glue_archive_temp_dir
   spark_event_logs              = var.glue_archive_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_archive_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_archive_execution_class
@@ -175,19 +171,18 @@ module "archive_backfill_job" {
   temp_dir                      = var.glue_archive_backfill_job_temp_dir
   spark_event_logs              = var.glue_archive_backfill_job_spark_event_logs
   # Placeholder Script Location
-  script_location              = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter = var.glue_archive_backfill_job_enable_cont_log_filter
-  project_id                   = var.project_id
-  aws_kms_key                  = var.s3_kms_arn
-  execution_class              = var.glue_archive_backfill_job_execution_class
-  additional_policies          = var.glue_archive_backfill_job_additional_policies
-  worker_type                  = var.glue_archive_backfill_job_worker_type
-  number_of_workers            = var.glue_archive_backfill_job_num_workers
-  max_concurrent               = var.glue_archive_backfill_job_max_concurrent
-  region                       = var.account_region
-  account                      = var.account_id
-  log_group_retention_in_days  = var.glue_log_group_retention_in_days
-  enable_spark_ui              = var.enable_spark_ui
+  script_location             = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
+  project_id                  = var.project_id
+  aws_kms_key                 = var.s3_kms_arn
+  execution_class             = var.glue_archive_backfill_job_execution_class
+  additional_policies         = var.glue_archive_backfill_job_additional_policies
+  worker_type                 = var.glue_archive_backfill_job_worker_type
+  number_of_workers           = var.glue_archive_backfill_job_num_workers
+  max_concurrent              = var.glue_archive_backfill_job_max_concurrent
+  region                      = var.account_region
+  account                     = var.account_id
+  log_group_retention_in_days = var.glue_log_group_retention_in_days
+  enable_spark_ui             = var.enable_spark_ui
 
   tags = merge(
     var.tags,
@@ -215,19 +210,18 @@ module "create_reload_diff_job" {
   temp_dir                      = var.glue_create_reload_diff_job_temp_dir
   spark_event_logs              = var.glue_create_reload_diff_job_spark_event_logs
   # Placeholder Script Location
-  script_location              = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter = var.glue_create_reload_diff_job_enable_cont_log_filter
-  project_id                   = var.project_id
-  aws_kms_key                  = var.s3_kms_arn
-  execution_class              = var.glue_create_reload_diff_job_execution_class
-  additional_policies          = var.glue_create_reload_diff_job_additional_policies
-  worker_type                  = var.glue_create_reload_diff_job_worker_type
-  number_of_workers            = var.glue_create_reload_diff_job_num_workers
-  max_concurrent               = var.glue_create_reload_diff_job_max_concurrent
-  region                       = var.account_region
-  account                      = var.account_id
-  log_group_retention_in_days  = var.glue_log_group_retention_in_days
-  enable_spark_ui              = var.enable_spark_ui
+  script_location             = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
+  project_id                  = var.project_id
+  aws_kms_key                 = var.s3_kms_arn
+  execution_class             = var.glue_create_reload_diff_job_execution_class
+  additional_policies         = var.glue_create_reload_diff_job_additional_policies
+  worker_type                 = var.glue_create_reload_diff_job_worker_type
+  number_of_workers           = var.glue_create_reload_diff_job_num_workers
+  max_concurrent              = var.glue_create_reload_diff_job_max_concurrent
+  region                      = var.account_region
+  account                     = var.account_id
+  log_group_retention_in_days = var.glue_log_group_retention_in_days
+  enable_spark_ui             = var.enable_spark_ui
 
   tags = merge(
     var.tags,
@@ -256,4 +250,3 @@ resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
     Jira          = "DPR2-713"
   }
 }
-
