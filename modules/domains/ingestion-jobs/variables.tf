@@ -35,7 +35,7 @@ variable "glue_batch_job_short_name" {
 
 variable "glue_batch_job_glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -180,7 +180,7 @@ variable "glue_cdc_job_short_name" {
 
 variable "glue_cdc_job_glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -326,7 +326,7 @@ variable "glue_unprocessed_raw_files_check_job_short_name" {
 
 variable "glue_unprocessed_raw_files_check_job_glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -466,7 +466,7 @@ variable "glue_archive_job_short_name" {
 
 variable "glue_archive_job_glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -598,7 +598,7 @@ variable "glue_archive_backfill_job_short_name" {
 
 variable "glue_archive_backfill_job_glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -703,7 +703,7 @@ variable "glue_create_reload_diff_job_short_name" {
 
 variable "glue_create_reload_diff_job_glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
