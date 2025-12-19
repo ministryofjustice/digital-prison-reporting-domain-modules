@@ -14,6 +14,7 @@ module "dms_instance" {
   vpc                          = var.vpc
   short_name                   = var.short_name
   allow_major_version_upgrade  = var.allow_major_version_upgrade
+  custom_metric_namespace      = var.custom_metric_namespace
 
   dms_log_retention_in_days = var.dms_log_retention_in_days
 
