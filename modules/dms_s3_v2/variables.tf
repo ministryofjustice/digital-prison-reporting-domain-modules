@@ -47,6 +47,12 @@ variable "create" {
   default = true
 }
 
+variable "custom_metric_namespace" {
+  type        = string
+  description = "Namespace for custom metrics related to DMS, e.g. log filter metrics that parse the logs for errors"
+  default     = "DPRAgentCustomMetrics"
+}
+
 #--------------------------------------------------------------
 # DMS Replication Instance
 #--------------------------------------------------------------
