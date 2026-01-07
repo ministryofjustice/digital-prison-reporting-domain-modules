@@ -6,7 +6,7 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
   # Patterns:
   # ]E: is the internal error marker, the equivalent of ERROR: or FATAL: in log4j and similar
   # FATAL/suspended are critical states
-  pattern = "?\"]E:\" ?\"FATAL\" ?\"suspended\""
+  pattern = "[msg=%]E:% || msg=%FATAL% || msg=%suspended%]"
 
   metric_transformation {
     name      = "DMSErrorCount"
@@ -26,7 +26,7 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_warnings" 
   # Patterns:
   # ]W: is the internal DMS warning marker, the equivalent of WARN: in log4j and similar
   # We exclude 'Unrecognized CDC record type' which is a noisy warn log line triggered by the heartbeat lambda
-  pattern = "\"]W:\" -\"Unrecognized CDC record type encountered\""
+  pattern = "[msg=%]W:% && msg!=\"*Unrecognized CDC record type encountered*\" ]"
 
   metric_transformation {
     name      = "DMSWarningCount"
