@@ -6,7 +6,7 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
   # Patterns:
   # ]E: is the internal error marker, the equivalent of ERROR: or FATAL: in log4j and similar
   # FATAL/suspended are critical states
-  pattern = "[msg=%]E:% || msg=%FATAL% || msg=%suspended%, instance=\"${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}\"]"
+  pattern = "[msg=%(]E:|FATAL|suspended)%, instance=\"${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}\"]"
 
 
   metric_transformation {
