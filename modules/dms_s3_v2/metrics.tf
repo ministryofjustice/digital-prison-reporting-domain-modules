@@ -5,7 +5,7 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
   log_group_name = aws_cloudwatch_log_group.dms-instance-log-group[0].name
   # Patterns:
   # ]E: is the internal error marker, the equivalent of ERROR: or FATAL: in log4j and similar
-  pattern = "]E:"
+  pattern = "\"]E:\""
 
 
   metric_transformation {
