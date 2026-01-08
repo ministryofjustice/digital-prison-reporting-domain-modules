@@ -5,7 +5,7 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
   log_group_name = aws_cloudwatch_log_group.dms-instance-log-group[0].name
   # Patterns:
   # ]E: is the internal error marker, the equivalent of ERROR: or FATAL: in log4j and similar
-  pattern = "[msg=%]E:%, instance=\"${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}\"]"
+  pattern = "]E:"
 
 
   metric_transformation {
@@ -13,27 +13,27 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
     namespace = var.custom_metric_namespace
     value     = "1"
     dimensions = {
-      "ReplicationInstanceId" : "$instance"
+      "ReplicationInstanceId" : aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id
     }
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_warnings" {
-  count = var.setup_dms_instance ? 1 : 0
-
-  name           = "DMSReplicationInstanceWarnings"
-  log_group_name = aws_cloudwatch_log_group.dms-instance-log-group[0].name
-  # Patterns:
-  # ]W: is the internal DMS warning marker, the equivalent of WARN: in log4j and similar
-  # We exclude 'Unrecognized CDC record type' which is a noisy warn log line triggered by the heartbeat lambda
-  pattern = "[msg=%]W:% && msg!=\"*Unrecognized CDC record type encountered*\", instance=\"${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}\"]"
-
-  metric_transformation {
-    name      = "DMSWarningCount"
-    namespace = var.custom_metric_namespace
-    value     = "1"
-    dimensions = {
-      "ReplicationInstanceId" : "$instance"
-    }
-  }
-}
+# resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_warnings" {
+#   count = var.setup_dms_instance ? 1 : 0
+#
+#   name           = "DMSReplicationInstanceWarnings"
+#   log_group_name = aws_cloudwatch_log_group.dms-instance-log-group[0].name
+#   # Patterns:
+#   # ]W: is the internal DMS warning marker, the equivalent of WARN: in log4j and similar
+#   # We exclude 'Unrecognized CDC record type' which is a noisy warn log line triggered by the heartbeat lambda
+#   pattern = "[msg=%]W:% && msg!=\"*Unrecognized CDC record type encountered*\", instance=\"${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}\"]"
+#
+#   metric_transformation {
+#     name      = "DMSWarningCount"
+#     namespace = var.custom_metric_namespace
+#     value     = "1"
+#     dimensions = {
+#       "ReplicationInstanceId" : "$instance"
+#     }
+#   }
+# }
