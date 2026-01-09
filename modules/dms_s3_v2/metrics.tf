@@ -1,11 +1,10 @@
 resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
   count = var.setup_dms_instance ? 1 : 0
 
-  name           = "DMSReplicationInstanceErrors"
+  name           = "DMSReplicationInstanceErrors-${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}"
   log_group_name = aws_cloudwatch_log_group.dms-instance-log-group[0].name
-  # Patterns:
   # ]E: is the internal error marker, the equivalent of ERROR: or FATAL: in log4j and similar
-  pattern = "\"]E:\""
+  pattern = "[msg=%]E:%, instance=\"${aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id}\"]"
 
 
   metric_transformation {
@@ -13,7 +12,7 @@ resource "aws_cloudwatch_log_metric_filter" "dms_replication_instance_errors" {
     namespace = var.custom_metric_namespace
     value     = "1"
     dimensions = {
-      "ReplicationInstanceId" : aws_dms_replication_instance.dms-s3-target-instance[0].replication_instance_id
+      "ReplicationInstanceId" : "$instance"
     }
   }
 }
