@@ -2,8 +2,6 @@
 locals {
   # The log groups we will monitor.
   log_groups_to_monitor = var.create_job ? [
-    aws_cloudwatch_log_group.job[0].name,
-    aws_cloudwatch_log_group.sec_config[0].name,
     aws_cloudwatch_log_group.sec_config_output[0].name,
     aws_cloudwatch_log_group.sec_config_error[0].name
   ] : []
@@ -16,17 +14,13 @@ locals {
       pattern     = "\"Exception\" -\"/usr/bin/java -cp\" -\"-Dspark.jars\" -\"/opt/amazon/lib/\""
     },
     warn = {
-      metric_name = "WarnCount"
+      metric_name = "GlueJobWarnCount"
       pattern     = "\"WARN\""
     },
     error = {
-      metric_name = "WarnCount"
-      pattern     = "\"ERROR\""
-    },
-    fatal = {
-      metric_name = "WarnCount"
-      pattern     = "\"FATAL\""
-    },
+      metric_name = "GlueJobErrorCount"
+      pattern     = "\"ERROR\" || \"FATAL\""
+    }
   }
 
   # Flatten the log_groups_to_monitor and signals_to_monitor maps so we can iterate over it easily
