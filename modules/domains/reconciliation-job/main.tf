@@ -28,6 +28,7 @@ module "glue_s3_data_reconciliation_job" {
   connections                 = var.connections
   additional_secret_arns      = var.additional_secret_arns
   enable_spark_ui             = var.enable_spark_ui
+  custom_metric_namespace     = var.custom_metric_namespace
 
   tags = merge(
     var.tags,
