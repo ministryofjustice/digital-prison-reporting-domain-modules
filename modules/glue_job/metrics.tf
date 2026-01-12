@@ -32,17 +32,17 @@ locals {
   # Flatten the log_groups_to_monitor and signals_to_monitor maps so we can iterate over it easily
   filter_metrics = var.create_job ? {
     for item in flatten([
-      for log_group in local.log_groups_to_monitor: [
-        for signal, pattern_config in local.signals_to_monitor: {
-          key = "${log_group}-${signal}"
+      for log_group in local.log_groups_to_monitor : [
+        for signal, pattern_config in local.signals_to_monitor : {
+          key            = "${log_group}-${signal}"
           log_group_name = log_group.name
-          signal = signal # e.g. exception, warn
-          metric_name = pattern_config.metric_name
-          pattern = pattern_config.pattern
+          signal         = signal # e.g. exception, warn
+          metric_name    = pattern_config.metric_name
+          pattern        = pattern_config.pattern
         }
       ]
-    ]): item.key => item
-  }: {}
+    ]) : item.key => item
+  } : {}
 }
 
 resource "aws_cloudwatch_log_metric_filter" "glue_exception_count" {
