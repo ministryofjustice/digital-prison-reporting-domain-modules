@@ -1,14 +1,14 @@
 # We will monitor log groups for messages containing certain strings that indicate errors, warnings, exceptions, etc.
 locals {
   # The log groups we will monitor.
-  log_groups_to_monitor = [
-    aws_cloudwatch_log_group.job,
-    aws_cloudwatch_log_group.sec_config,
-    aws_cloudwatch_log_group.sec_config_output,
-    aws_cloudwatch_log_group.sec_config_error
-  ]
+  log_groups_to_monitor = var.create_job ? [
+    aws_cloudwatch_log_group.job[0],
+    aws_cloudwatch_log_group.sec_config[0],
+    aws_cloudwatch_log_group.sec_config_output[0],
+    aws_cloudwatch_log_group.sec_config_error[0]
+  ] : []
 
-  # The signals in the logs we want to create metrics for
+  # The signals/patterns in the logs we want to create metrics for
   signals_to_monitor = {
     exception = {
       # We exclude log messages that include "Exception" due to app startup classpath
