@@ -2,10 +2,10 @@
 locals {
   # The log groups we will monitor.
   log_groups_to_monitor = var.create_job ? [
-    aws_cloudwatch_log_group.job[0],
-    aws_cloudwatch_log_group.sec_config[0],
-    aws_cloudwatch_log_group.sec_config_output[0],
-    aws_cloudwatch_log_group.sec_config_error[0]
+    aws_cloudwatch_log_group.job[0].name,
+    aws_cloudwatch_log_group.sec_config[0].name,
+    aws_cloudwatch_log_group.sec_config_output[0].name,
+    aws_cloudwatch_log_group.sec_config_error[0].name
   ] : []
 
   # The signals/patterns in the logs we want to create metrics for
@@ -35,7 +35,7 @@ locals {
       for log_group in local.log_groups_to_monitor : [
         for signal, pattern_config in local.signals_to_monitor : {
           key            = "${log_group}-${signal}"
-          log_group_name = log_group.name
+          log_group_name = log_group
           signal         = signal # e.g. exception, warn
           metric_name    = pattern_config.metric_name
           pattern        = pattern_config.pattern
