@@ -19,7 +19,7 @@ locals {
     },
     error = {
       metric_name = "GlueJobErrorCount"
-      pattern     = "\"ERROR\" || \"FATAL\""
+      pattern     = "?\"ERROR\" ?\"FATAL\""
     }
   }
 
