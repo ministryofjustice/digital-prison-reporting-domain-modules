@@ -117,6 +117,12 @@ variable "log_group_retention_in_days" {
   description = "(Optional) The default number of days log events retained in the glue job log group."
 }
 
+variable "custom_metric_namespace" {
+  type        = string
+  description = "Namespace for custom metrics related to Glue, e.g. log filter metrics that parse the logs for errors"
+  default     = "DPRAgentCustomMetrics"
+}
+
 variable "connections" {
   type        = list(string)
   default     = []

@@ -28,6 +28,7 @@ module "glue_reporting_hub_cdc_job" {
   connections                   = var.glue_cdc_job_connections
   additional_secret_arns        = var.glue_cdc_job_additional_secret_arns
   enable_spark_ui               = var.enable_spark_ui
+  custom_metric_namespace       = var.custom_metric_namespace
 
   arguments = var.glue_cdc_arguments
 
@@ -68,6 +69,7 @@ module "glue_reporting_hub_batch_job" {
   connections                   = var.glue_batch_job_connections
   additional_secret_arns        = var.glue_batch_job_additional_secret_arns
   enable_spark_ui               = var.enable_spark_ui
+  custom_metric_namespace       = var.custom_metric_namespace
 
   arguments = var.glue_batch_arguments
 
@@ -105,6 +107,7 @@ module "unprocessed_raw_files_check_job" {
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_log_group_retention_in_days
   enable_spark_ui               = var.enable_spark_ui
+  custom_metric_namespace       = var.custom_metric_namespace
 
   arguments = var.glue_unprocessed_raw_files_check_arguments
 
@@ -144,6 +147,7 @@ module "glue_archive_job" {
   account                       = var.account_id
   log_group_retention_in_days   = var.glue_log_group_retention_in_days
   enable_spark_ui               = var.enable_spark_ui
+  custom_metric_namespace       = var.custom_metric_namespace
 
   arguments = var.glue_archive_arguments
 
@@ -183,6 +187,7 @@ module "archive_backfill_job" {
   account                     = var.account_id
   log_group_retention_in_days = var.glue_log_group_retention_in_days
   enable_spark_ui             = var.enable_spark_ui
+  custom_metric_namespace     = var.custom_metric_namespace
 
   tags = merge(
     var.tags,
@@ -222,6 +227,7 @@ module "create_reload_diff_job" {
   account                     = var.account_id
   log_group_retention_in_days = var.glue_log_group_retention_in_days
   enable_spark_ui             = var.enable_spark_ui
+  custom_metric_namespace     = var.custom_metric_namespace
 
   tags = merge(
     var.tags,
