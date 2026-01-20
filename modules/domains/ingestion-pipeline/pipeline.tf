@@ -84,6 +84,7 @@ locals {
         "JobName" : var.glue_hive_table_creation_jobname,
         "Arguments" : {
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -100,6 +101,7 @@ locals {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
           "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -125,6 +127,7 @@ locals {
           "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
           "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -141,6 +144,7 @@ locals {
         "JobName" : var.glue_switch_prisons_hive_data_location_job,
         "Arguments" : {
           "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -173,6 +177,7 @@ locals {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
           "--dpr.file.deletion.buckets" : "${var.s3_landing_processing_bucket_id},${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -331,6 +336,7 @@ locals {
         "JobName" : var.glue_reporting_hub_batch_jobname,
         "Arguments" : {
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -356,6 +362,7 @@ locals {
           "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
           "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -373,6 +380,7 @@ locals {
         "Arguments" : {
           "--dpr.maintenance.root.path" : var.s3_structured_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
         "NumberOfWorkers" : var.compaction_structured_num_workers,
@@ -392,6 +400,7 @@ locals {
         "Arguments" : {
           "--dpr.maintenance.root.path" : var.s3_structured_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
         "NumberOfWorkers" : var.retention_structured_num_workers,
@@ -411,6 +420,7 @@ locals {
         "Arguments" : {
           "--dpr.maintenance.root.path" : var.s3_curated_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
         "NumberOfWorkers" : var.compaction_curated_num_workers,
@@ -430,6 +440,7 @@ locals {
         "Arguments" : {
           "--dpr.maintenance.root.path" : var.s3_curated_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
         "NumberOfWorkers" : var.retention_curated_num_workers,
@@ -509,6 +520,7 @@ locals {
         "JobName" : var.glue_switch_prisons_hive_data_location_job,
         "Arguments" : {
           "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
@@ -541,6 +553,7 @@ locals {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
           "--dpr.file.deletion.buckets" : var.s3_temp_reload_bucket_id,
+          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
       },
