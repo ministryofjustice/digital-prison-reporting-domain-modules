@@ -155,10 +155,7 @@ locals {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
-        "JobName" : var.archive_backfill_job,
-        "Arguments" : {
-          "--dpr.approx.data.size.gb" : tostring(var.approx_data_size_gb)
-        }
+        "JobName" : var.archive_backfill_job
       },
       "Next" : local.empty_archive_data.StepName
     }
@@ -483,10 +480,7 @@ locals {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
-        "JobName" : var.glue_create_reload_diff_job,
-        "Arguments" : {
-          "--dpr.approx.data.size.gb" : tostring(var.approx_data_size_gb)
-        }
+        "JobName" : var.glue_create_reload_diff_job
       },
       "Next" : local.move_reload_diffs_toInsert_to_archive_bucket.StepName
     }

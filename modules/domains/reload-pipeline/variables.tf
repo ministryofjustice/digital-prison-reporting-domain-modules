@@ -412,11 +412,6 @@ variable "domain" {
   description = "Domain Name"
 }
 
-variable "approx_data_size_gb" {
-  type        = number
-  description = "The approximate data size in GigaBytes. When less than a GB set to 1"
-}
-
 variable "reload_diff_folder" {
   type        = string
   default     = "diffs"
