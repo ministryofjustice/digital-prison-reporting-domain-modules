@@ -596,7 +596,8 @@ locals {
           "--dpr.maintenance.root.path" : var.s3_structured_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
+          "--dpr.config.key" : var.domain,
+          "--dpr.maintenance.full.compaction": "true"
         },
         "NumberOfWorkers" : var.compaction_structured_num_workers,
         "WorkerType" : var.compaction_structured_worker_type
@@ -636,7 +637,8 @@ locals {
           "--dpr.maintenance.root.path" : var.s3_curated_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
+          "--dpr.config.key" : var.domain,
+          "--dpr.maintenance.full.compaction": "true"
         },
         "NumberOfWorkers" : var.compaction_curated_num_workers,
         "WorkerType" : var.compaction_curated_worker_type
