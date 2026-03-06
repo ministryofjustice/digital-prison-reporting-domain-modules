@@ -115,3 +115,9 @@ variable "source_engine_name" {
   default     = ""
   description = "Engine name for DMS"
 }
+
+variable "s3_cdc_max_batch_interval" {
+  description = "(Optional) Maximum length of the interval, defined in seconds, after which to output a file to Amazon S3"
+  type        = number
+  default     = 10
+}
