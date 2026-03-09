@@ -6,6 +6,7 @@ module "dms_endpoints" {
   setup_dms_iam                       = var.setup_dms_iam
   setup_dms_source_endpoint           = var.setup_dms_source_endpoint
   setup_dms_s3_endpoint               = var.setup_dms_s3_endpoint
+  cdc_max_batch_interval              = var.s3_cdc_max_batch_interval
   source_engine_name                  = var.source_engine_name
   dms_source_name                     = var.dms_source_name
   dms_target_name                     = var.dms_target_name
