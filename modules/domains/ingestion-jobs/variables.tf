@@ -98,8 +98,8 @@ variable "glue_batch_job_worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition     = contains(["Standard", "G.1X", "G.2X"], var.glue_batch_job_worker_type)
-    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.glue_batch_job_worker_type)
+    error_message = "Accepts a value of G.1X, G.2X, G.4X, or G.8X"
   }
 }
 
@@ -248,8 +248,8 @@ variable "glue_cdc_job_worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition     = contains(["Standard", "G.025X", "G.1X", "G.2X"], var.glue_cdc_job_worker_type)
-    error_message = "Accepts a value of Standard, G.025X, G.1X, or G.2X."
+    condition     = contains(["G.025X", "G.1X", "G.2X"], var.glue_cdc_job_worker_type)
+    error_message = "Accepts a value of G.025X, G.1X, or G.2X."
   }
 }
 
@@ -394,8 +394,8 @@ variable "glue_unprocessed_raw_files_check_job_worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition     = contains(["Standard", "G.1X", "G.2X"], var.glue_unprocessed_raw_files_check_job_worker_type)
-    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+    condition     = contains(["G.1X", "G.2X"], var.glue_unprocessed_raw_files_check_job_worker_type)
+    error_message = "Accepts a value of G.1X, or G.2X."
   }
 }
 
@@ -534,8 +534,8 @@ variable "glue_archive_job_worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when a job runs."
 
   validation {
-    condition     = contains(["Standard", "G.1X", "G.2X"], var.glue_archive_job_worker_type)
-    error_message = "Accepts a value of Standard, G.1X, or G.2X."
+    condition     = contains(["G.1X", "G.2X"], var.glue_archive_job_worker_type)
+    error_message = "Accepts a value of G.1X, or G.2X."
   }
 }
 
@@ -654,7 +654,7 @@ variable "glue_archive_backfill_job_worker_type" {
   description = "(Optional) The type of predefined worker that is allocated when the archive backfill job runs"
 
   validation {
-    condition     = contains(["G.1X", "G.2X"], var.glue_archive_backfill_job_worker_type)
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.glue_archive_backfill_job_worker_type)
     error_message = "Accepts a value of G.1X, G.2X, G.4X, or G.8X"
   }
 }
