@@ -22,14 +22,11 @@ module "maintenance_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
-          "Next" : "Run Compaction Job on Structured Zone"
+          "Next" : "Compact And Vacuum"
         },
-        "Maintenance" : {
+        "Compact And Vacuum" : {
           "Type" : "Parallel",
-          "InputPath" : "$",
-          "OutputPath" : "$",
-          "ResultPath" : "$.ParallelResultPath",
-          "Next" : "Archive Raw Data",
+          "Next" : "Start Glue Streaming Job",
           "Branches" : [
             {
               "StartAt" : "Run Compaction Job on Structured Zone",
@@ -44,8 +41,8 @@ module "maintenance_pipeline" {
                       "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
                       "--dpr.config.key" : var.domain
                     },
-                    "NumberOfWorkers" : var.compaction_structured_num_workers,
-                    "WorkerType" : var.compaction_structured_worker_type
+                    "NumberOfWorkers" : var.compaction_job_num_workers,
+                    "WorkerType" : var.compaction_job_worker_type
                   },
                   "Next" : "Run Vacuum Job on Structured Zone"
                 },
@@ -59,8 +56,8 @@ module "maintenance_pipeline" {
                       "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
                       "--dpr.config.key" : var.domain
                     },
-                    "NumberOfWorkers" : var.retention_structured_num_workers,
-                    "WorkerType" : var.retention_structured_worker_type
+                    "NumberOfWorkers" : var.retention_job_num_workers,
+                    "WorkerType" : var.retention_job_worker_type
                   },
                   "End" : true
                 }
@@ -79,8 +76,8 @@ module "maintenance_pipeline" {
                       "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
                       "--dpr.config.key" : var.domain
                     },
-                    "NumberOfWorkers" : var.compaction_curated_num_workers,
-                    "WorkerType" : var.compaction_curated_worker_type
+                    "NumberOfWorkers" : var.compaction_job_num_workers,
+                    "WorkerType" : var.compaction_job_worker_type
                   },
                   "Next" : "Run Vacuum Job on Curated Zone"
                 },
@@ -94,8 +91,8 @@ module "maintenance_pipeline" {
                       "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
                       "--dpr.config.key" : var.domain
                     },
-                    "NumberOfWorkers" : var.retention_curated_num_workers,
-                    "WorkerType" : var.retention_curated_worker_type
+                    "NumberOfWorkers" : var.retention_job_num_workers,
+                    "WorkerType" : var.retention_job_worker_type
                   },
                   "End" : true
                 }

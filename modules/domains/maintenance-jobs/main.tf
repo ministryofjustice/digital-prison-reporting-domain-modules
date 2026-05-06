@@ -2,7 +2,7 @@
 # Glue Job, Delta Compaction Job
 module "glue_delta_compaction_job" {
   source                        = "../../glue_job"
-  create_job                    = var.create_compaction_job
+  create_job                    = var.create_maintenance_jobs
   create_role                   = var.create_compaction_job_role
   name                          = var.compaction_job_name
   short_name                    = var.compaction_job_short_name
@@ -16,7 +16,7 @@ module "glue_delta_compaction_job" {
   temp_dir         = var.temp_dir
   project_id       = var.project_id
   aws_kms_key      = var.s3_kms_arn
-  spark_event_logs = var.spark_event_logs
+  spark_event_logs = var.compaction_job_spark_event_logs
 
   execution_class             = var.execution_class
   worker_type                 = var.compaction_job_worker_type
@@ -27,6 +27,7 @@ module "glue_delta_compaction_job" {
   log_group_retention_in_days = var.log_group_retention_in_days
   additional_secret_arns      = var.additional_secret_arns
   enable_spark_ui             = var.enable_spark_ui
+  custom_metric_namespace     = var.custom_metric_namespace
 
   tags = merge(
     var.tags,
@@ -40,8 +41,8 @@ module "glue_delta_compaction_job" {
 
 # Glue Job, Delta Retention (vacuum) Job
 module "glue_delta_retention_job" {
-  source                        = "./modules/glue_job"
-  create_job                    = var.create_retention_job
+  source                        = "../../glue_job"
+  create_job                    = var.create_maintenance_jobs
   create_role                   = var.create_retention_job_role
   name                          = var.retention_job_name
   short_name                    = var.retention_job_short_name
@@ -55,7 +56,7 @@ module "glue_delta_retention_job" {
   temp_dir         = var.temp_dir
   project_id       = var.project_id
   aws_kms_key      = var.s3_kms_arn
-  spark_event_logs = var.spark_event_logs
+  spark_event_logs = var.retention_job_spark_event_logs
 
   execution_class             = var.execution_class
   worker_type                 = var.retention_job_worker_type
@@ -66,6 +67,7 @@ module "glue_delta_retention_job" {
   log_group_retention_in_days = var.log_group_retention_in_days
   additional_secret_arns      = var.additional_secret_arns
   enable_spark_ui             = var.enable_spark_ui
+  custom_metric_namespace     = var.custom_metric_namespace
 
   tags = merge(
     var.tags,

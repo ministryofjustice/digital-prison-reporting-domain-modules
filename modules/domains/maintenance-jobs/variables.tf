@@ -18,14 +18,8 @@ variable "script_file_version" {
   description = "The filename of the glue script, including version"
 }
 
-variable "create_compaction_job" {
-  description = "Enable compaction job, True or False"
-  type        = bool
-  default     = false
-}
-
-variable "create_retention_job" {
-  description = "Enable retention job, True or False"
+variable "create_maintenance_jobs" {
+  description = "Enable maintenance jobs, True or False"
   type        = bool
   default     = false
 }
@@ -80,10 +74,16 @@ variable "temp_dir" {
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
 }
 
-variable "spark_event_logs" {
+variable "compaction_job_spark_event_logs" {
   type        = string
   default     = null
-  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the compaction job."
+}
+
+variable "retention_job_spark_event_logs" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the retention job."
 }
 
 variable "execution_class" {
@@ -178,4 +178,10 @@ variable "enable_spark_ui" {
   type        = string
   default     = "true"
   description = "UI Enabled by default, override with False"
+}
+
+variable "custom_metric_namespace" {
+  type        = string
+  description = "Namespace for custom metrics related to Glue, e.g. log filter metrics that parse the logs for errors"
+  default     = "DPRAgentCustomMetrics"
 }
