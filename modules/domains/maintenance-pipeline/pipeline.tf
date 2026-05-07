@@ -26,6 +26,9 @@ module "maintenance_pipeline" {
         },
         "Compact And Vacuum" : {
           "Type" : "Parallel",
+          "InputPath" : "$",
+          "OutputPath" : "$",
+          "ResultPath" : "$.ParallelResultPath",
           "Next" : "Start Glue Streaming Job",
           "Branches" : [
             {
