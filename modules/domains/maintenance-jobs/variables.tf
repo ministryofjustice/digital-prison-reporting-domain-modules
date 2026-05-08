@@ -18,31 +18,41 @@ variable "script_file_version" {
   description = "The filename of the glue script, including version"
 }
 
-variable "create_job" {
-  description = "Enable Reconciliation Job, True or False"
+variable "create_maintenance_jobs" {
+  description = "Enable maintenance jobs, True or False"
   type        = bool
   default     = false
 }
 
-variable "batch_only" {
-  description = "Determines if the pipeline is batch only, True or False?"
+variable "create_compaction_job_role" {
+  description = "(Optional) Create AWS IAM role associated with the compaction job."
   type        = bool
   default     = false
 }
 
-variable "create_role" {
-  description = "(Optional) Create AWS IAM role associated with the job."
+variable "create_retention_job_role" {
+  description = "(Optional) Create AWS IAM role associated with the retention job."
   type        = bool
   default     = false
 }
 
-variable "job_name" {
-  description = "Name of the Glue Reconciliation Job"
+variable "compaction_job_name" {
+  description = "Name of the Glue compaction job"
   type        = string
 }
 
-variable "short_name" {
-  description = "Short name for the Glue Reconciliation Job"
+variable "retention_job_name" {
+  description = "Name of the Glue retention job"
+  type        = string
+}
+
+variable "compaction_job_short_name" {
+  description = "Short name for the Glue compaction job"
+  type        = string
+}
+
+variable "retention_job_short_name" {
+  description = "Short name for the Glue retention job"
   type        = string
 }
 
@@ -64,10 +74,16 @@ variable "temp_dir" {
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
 }
 
-variable "spark_event_logs" {
+variable "compaction_job_spark_event_logs" {
   type        = string
   default     = null
-  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the compaction job."
+}
+
+variable "retention_job_spark_event_logs" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the retention job."
 }
 
 variable "execution_class" {
@@ -76,14 +92,25 @@ variable "execution_class" {
   type        = string
 }
 
-variable "worker_type" {
+variable "compaction_job_worker_type" {
   type        = string
   default     = "G.1X"
-  description = "(Optional) The type of predefined worker that is allocated when a job runs."
+  description = "(Optional) The type of predefined worker that is allocated when a compaction job runs."
 
   validation {
-    condition     = contains(["G.025X", "G.1X", "G.2X"], var.worker_type)
-    error_message = "Accepts a value of G.025X, G.1X, or G.2X."
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.compaction_job_worker_type)
+    error_message = "Accepts a value of G.1X, G.2X, G.4X or G.8X."
+  }
+}
+
+variable "retention_job_worker_type" {
+  type        = string
+  default     = "G.1X"
+  description = "(Optional) The type of predefined worker that is allocated when a retention job runs."
+
+  validation {
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_job_worker_type)
+    error_message = "Accepts a value of G.1X, G.2X, G.4X or G.8X."
   }
 }
 
@@ -99,7 +126,13 @@ variable "account_region" {
   type        = string
 }
 
-variable "num_workers" {
+variable "compaction_job_num_workers" {
+  type        = number
+  default     = 2
+  description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
+}
+
+variable "retention_job_num_workers" {
   type        = number
   default     = 2
   description = "(Optional) The number of workers of a defined workerType that are allocated when a job runs."
@@ -107,7 +140,7 @@ variable "num_workers" {
 
 variable "max_concurrent_runs" {
   type        = number
-  default     = 1
+  default     = 128
   description = "(Optional) The maximum number of concurrent runs allowed for a job."
 }
 
@@ -115,18 +148,6 @@ variable "log_group_retention_in_days" {
   type        = number
   default     = 7
   description = "(Optional) The default number of days log events retained in the glue job log group."
-}
-
-variable "custom_metric_namespace" {
-  type        = string
-  description = "Namespace for custom metrics related to Glue, e.g. log filter metrics that parse the logs for errors"
-  default     = "DPRAgentCustomMetrics"
-}
-
-variable "connections" {
-  type        = list(string)
-  default     = []
-  description = "The list of Glue connections used for the batch job."
 }
 
 variable "additional_secret_arns" {
@@ -141,25 +162,26 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-variable "glue_job_arguments" {
+variable "glue_compaction_job_arguments" {
   type        = map(string)
   default     = {}
-  description = "(Optional) Arguments for the Reconciliation job"
+  description = "(Optional) Arguments for the compaction job"
 }
 
-variable "job_schedule" {
-  description = "Cron schedule for the reconciliation job. Leave unset for no schedule."
-  default     = ""
-  type        = string
-
-  validation {
-    condition     = var.batch_only && (var.job_schedule != "") ? false : true
-    error_message = "Reconciliation job can only be scheduled when batch_only = false"
-  }
+variable "glue_retention_job_arguments" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Arguments for the retention job"
 }
 
 variable "enable_spark_ui" {
   type        = string
   default     = "true"
   description = "UI Enabled by default, override with False"
+}
+
+variable "custom_metric_namespace" {
+  type        = string
+  description = "Namespace for custom metrics related to Glue, e.g. log filter metrics that parse the logs for errors"
+  default     = "DPRAgentCustomMetrics"
 }

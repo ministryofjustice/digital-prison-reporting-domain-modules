@@ -158,90 +158,46 @@ variable "s3_curated_path" {
   type        = string
 }
 
-variable "compaction_structured_worker_type" {
-  description = "(Optional) Worker type to use for the compaction job in structured zone"
+variable "compaction_job_worker_type" {
+  description = "(Optional) Worker type to use for the compaction job"
   type        = string
   default     = "G.1X"
 
   validation {
-    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.compaction_structured_worker_type)
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.compaction_job_worker_type)
     error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
   }
 }
 
-variable "compaction_structured_num_workers" {
-  description = "(Optional) Number of workers to use for the compaction job in structured zone. Must be >= 2"
+variable "compaction_job_num_workers" {
+  description = "(Optional) Number of workers to use for the compaction job. Must be >= 2"
   type        = number
   default     = 3
 
   validation {
-    condition     = var.compaction_structured_num_workers >= 2
+    condition     = var.compaction_job_num_workers >= 2
     error_message = "Number of workers must be >= 2"
   }
 }
 
-variable "compaction_curated_worker_type" {
-  description = "(Optional) Worker type to use for the compaction job in curated zone"
+variable "retention_job_worker_type" {
+  description = "(Optional) Worker type to use for the retention job"
   type        = string
   default     = "G.1X"
 
   validation {
-    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.compaction_curated_worker_type)
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_job_worker_type)
     error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
   }
 }
 
-variable "compaction_curated_num_workers" {
-  description = "(Optional) Number of workers to use for the compaction job in curated zone. Must be >= 2"
+variable "retention_job_num_workers" {
+  description = "(Optional) Number of workers to use for the retention job. Must be >= 2"
   type        = number
   default     = 3
 
   validation {
-    condition     = var.compaction_curated_num_workers >= 2
-    error_message = "Number of workers must be >= 2"
-  }
-}
-
-variable "retention_structured_worker_type" {
-  description = "(Optional) Worker type to use for the retention job in structured zone"
-  type        = string
-  default     = "G.1X"
-
-  validation {
-    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_structured_worker_type)
-    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
-  }
-}
-
-variable "retention_structured_num_workers" {
-  description = "(Optional) Number of workers to use for the retention job in structured zone. Must be >= 2"
-  type        = number
-  default     = 3
-
-  validation {
-    condition     = var.retention_structured_num_workers >= 2
-    error_message = "Number of workers must be >= 2"
-  }
-}
-
-variable "retention_curated_worker_type" {
-  description = "(Optional) Worker type to use for the retention job in curated zone"
-  type        = string
-  default     = "G.1X"
-
-  validation {
-    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_curated_worker_type)
-    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
-  }
-}
-
-variable "retention_curated_num_workers" {
-  description = "(Optional) Number of workers to use for the retention job in curated zone. Must be >= 2"
-  type        = number
-  default     = 3
-
-  validation {
-    condition     = var.retention_curated_num_workers >= 2
+    condition     = var.retention_job_num_workers >= 2
     error_message = "Number of workers must be >= 2"
   }
 }

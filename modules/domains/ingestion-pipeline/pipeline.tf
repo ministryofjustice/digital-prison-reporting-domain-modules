@@ -366,7 +366,42 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_compaction_job_on_structured_zone.StepName
+      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_maintenance_jobs.StepName
+    }
+  }
+
+  run_maintenance_jobs = {
+    "StepName" : "Compact And Vacuum",
+    "StepDefinition" : {
+      "Type" : "Parallel",
+      "InputPath" : "$",
+      "OutputPath" : "$",
+      "ResultPath" : "$.ParallelResultPath",
+      "Next" : "Post Maintenance",
+      "Branches" : [
+        {
+          "StartAt" : "Run Compaction Job on Structured Zone",
+          "States" : {
+            (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
+            (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
+          }
+        },
+        {
+          "StartAt" : "Run Compaction Job on Curated Zone",
+          "States" : {
+            (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
+            (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+          }
+        }
+      ]
+    }
+  }
+
+  post_maintenance = {
+    "StepName" : "Post Maintenance",
+    "StepDefinition" : {
+      "Type" : "Pass",
+      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
     }
   }
 
@@ -384,8 +419,8 @@ locals {
           "--dpr.config.key" : var.domain,
           "--dpr.maintenance.full.compaction" : "true"
         },
-        "NumberOfWorkers" : var.compaction_structured_num_workers,
-        "WorkerType" : var.compaction_structured_worker_type
+        "NumberOfWorkers" : var.compaction_job_num_workers,
+        "WorkerType" : var.compaction_job_worker_type
       },
       "Next" : local.run_vacuum_job_on_structured_zone.StepName
     }
@@ -404,10 +439,10 @@ locals {
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
-        "NumberOfWorkers" : var.retention_structured_num_workers,
-        "WorkerType" : var.retention_structured_worker_type
+        "NumberOfWorkers" : var.retention_job_num_workers,
+        "WorkerType" : var.retention_job_worker_type
       },
-      "Next" : local.run_compaction_job_on_curated_zone.StepName
+      "End" : true
     }
   }
 
@@ -425,8 +460,8 @@ locals {
           "--dpr.config.key" : var.domain,
           "--dpr.maintenance.full.compaction" : "true"
         },
-        "NumberOfWorkers" : var.compaction_curated_num_workers,
-        "WorkerType" : var.compaction_curated_worker_type
+        "NumberOfWorkers" : var.compaction_job_num_workers,
+        "WorkerType" : var.compaction_job_worker_type
       },
       "Next" : local.run_vacuum_job_on_curated_zone.StepName
     }
@@ -445,10 +480,10 @@ locals {
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
-        "NumberOfWorkers" : var.retention_curated_num_workers,
-        "WorkerType" : var.retention_curated_worker_type
+        "NumberOfWorkers" : var.retention_job_num_workers,
+        "WorkerType" : var.retention_job_worker_type
       },
-      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
+      "End" : true
     }
   }
 
@@ -587,10 +622,8 @@ module "data_ingestion_pipeline" {
       (local.invoke_landing_zone_processing_lambda.StepName) : local.invoke_landing_zone_processing_lambda.StepDefinition,
       (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
       (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-      (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-      (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
-      (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-      (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+      (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
+      (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
       (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
       (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
     }
@@ -609,10 +642,8 @@ module "data_ingestion_pipeline" {
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
         (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
         (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-        (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-        (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
-        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-        (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+        (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
+        (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
@@ -662,10 +693,8 @@ module "data_ingestion_pipeline" {
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
         (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
         (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-        (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-        (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
-        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-        (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+        (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
+        (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.resume_dms_replication_task.StepName) : local.resume_dms_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,

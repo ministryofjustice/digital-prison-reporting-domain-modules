@@ -581,7 +581,42 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_compaction_job_on_structured_zone.StepName
+      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_maintenance_jobs.StepName
+    }
+  }
+
+  run_maintenance_jobs = {
+    "StepName" : "Compact And Vacuum",
+    "StepDefinition" : {
+      "Type" : "Parallel",
+      "InputPath" : "$",
+      "OutputPath" : "$",
+      "ResultPath" : "$.ParallelResultPath",
+      "Next" : "Post Maintenance",
+      "Branches" : [
+        {
+          "StartAt" : "Run Compaction Job on Structured Zone",
+          "States" : {
+            (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
+            (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
+          }
+        },
+        {
+          "StartAt" : "Run Compaction Job on Curated Zone",
+          "States" : {
+            (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
+            (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+          }
+        }
+      ]
+    }
+  }
+
+  post_maintenance = {
+    "StepName" : "Post Maintenance",
+    "StepDefinition" : {
+      "Type" : "Pass",
+      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
     }
   }
 
@@ -596,11 +631,10 @@ locals {
           "--dpr.maintenance.root.path" : var.s3_structured_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain,
-          "--dpr.maintenance.full.compaction" : "true"
+          "--dpr.config.key" : var.domain
         },
-        "NumberOfWorkers" : var.compaction_structured_num_workers,
-        "WorkerType" : var.compaction_structured_worker_type
+        "NumberOfWorkers" : var.compaction_job_num_workers,
+        "WorkerType" : var.compaction_job_worker_type
       },
       "Next" : local.run_vacuum_job_on_structured_zone.StepName
     }
@@ -619,10 +653,10 @@ locals {
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
-        "NumberOfWorkers" : var.retention_structured_num_workers,
-        "WorkerType" : var.retention_structured_worker_type
+        "NumberOfWorkers" : var.retention_job_num_workers,
+        "WorkerType" : var.retention_job_worker_type
       },
-      "Next" : local.run_compaction_job_on_curated_zone.StepName
+      "End" : true
     }
   }
 
@@ -637,11 +671,10 @@ locals {
           "--dpr.maintenance.root.path" : var.s3_curated_path,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain,
-          "--dpr.maintenance.full.compaction" : "true"
+          "--dpr.config.key" : var.domain
         },
-        "NumberOfWorkers" : var.compaction_curated_num_workers,
-        "WorkerType" : var.compaction_curated_worker_type
+        "NumberOfWorkers" : var.compaction_job_num_workers,
+        "WorkerType" : var.compaction_job_worker_type
       },
       "Next" : local.run_vacuum_job_on_curated_zone.StepName
     }
@@ -660,10 +693,10 @@ locals {
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         },
-        "NumberOfWorkers" : var.retention_curated_num_workers,
-        "WorkerType" : var.retention_curated_worker_type
+        "NumberOfWorkers" : var.retention_job_num_workers,
+        "WorkerType" : var.retention_job_worker_type
       },
-      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
+      "End" : true
     }
   }
 

@@ -50,6 +50,7 @@ variable "dms_target_endpoint" {
 
 variable "name" {
   description = "DMS Replication name."
+  type        = string
   default     = ""
 }
 
