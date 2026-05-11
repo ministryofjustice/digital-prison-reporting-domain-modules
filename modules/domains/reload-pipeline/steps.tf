@@ -423,6 +423,43 @@ locals {
     }
   }
 
+  run_batch_processes = {
+    "StepName" : "Run Batch Processes",
+    "StepDefinition" : {
+      "Type" : "Parallel",
+      "InputPath" : "$",
+      "OutputPath" : "$",
+      "ResultPath" : "$.ParallelResultPath",
+      "Next" : "Proceed To Streaming Process",
+      "Branches" : [
+        {
+          "StartAt" : "Run Glue Batch Job",
+          "States" : {
+            (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition
+          }
+        },
+        {
+          "StartAt" : "Delete Existing Reload Diffs",
+          "States" : {
+            (local.delete_existing_reload_diffs.StepName) : local.delete_existing_reload_diffs.StepDefinition,
+            (local.run_create_reload_diff_batch_job.StepName) : local.run_create_reload_diff_batch_job.StepDefinition,
+            (local.move_reload_diffs_toInsert_to_archive_bucket.StepName) : local.move_reload_diffs_toInsert_to_archive_bucket.StepDefinition,
+            (local.move_reload_diffs_toDelete_to_archive_bucket.StepName) : local.move_reload_diffs_toDelete_to_archive_bucket.StepDefinition,
+            (local.move_reload_diffs_toUpdate_to_archive_bucket.StepName) : local.move_reload_diffs_toUpdate_to_archive_bucket.StepDefinition,
+          }
+        }
+      ]
+    }
+  }
+
+  proceed_to_streaming_process = {
+    "StepName" : "Proceed To Streaming Process",
+    "StepDefinition" : {
+      "Type" : "Pass",
+      "Next" : local.empty_raw_data.StepName
+    }
+  }
+
   set_dms_cdc_replication_task_start_time = {
     "StepName" : "Set DMS CDC Replication Task Start Time",
     "StepDefinition" : {
