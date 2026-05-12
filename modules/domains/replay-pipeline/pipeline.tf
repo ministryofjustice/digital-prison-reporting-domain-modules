@@ -164,33 +164,28 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Run Batch Processes"
+          "Next" : "Start Glue Batch Job"
         },
-        "Run Batch Processes" : {
+        "Start Glue Batch Job" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_reporting_hub_batch_jobname,
+            "Arguments" : {
+              "--dpr.batch.load.fileglobpattern" : "{part-*.snappy.parquet,LOAD*parquet}",
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            }
+          },
+          "Next" : "Compact"
+        },
+        "Compact" : {
           "Type" : "Parallel",
           "InputPath" : "$",
           "OutputPath" : "$",
           "ResultPath" : "$.ParallelResultPath",
           "Next" : "Proceed To Streaming Process",
           "Branches" : [
-            {
-              "StartAt" : "Start Glue Batch Job",
-              "States" : {
-                "Start Glue Batch Job" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_reporting_hub_batch_jobname,
-                    "Arguments" : {
-                      "--dpr.batch.load.fileglobpattern" : "{part-*.snappy.parquet,LOAD*parquet}",
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    }
-                  },
-                  "End" : true
-                },
-              },
-            },
             {
               "StartAt" : "Run Compaction Job on Structured Zone",
               "States" : {
