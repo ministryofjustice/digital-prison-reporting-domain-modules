@@ -472,7 +472,7 @@ locals {
           "--dpr.cdc.dms.replication.task.id" : var.cdc_replication_task_id
         }
       },
-      "Next" : local.run_glue_batch_job.StepName
+      "Next" : local.run_batch_processes.StepName
     }
   }
 
