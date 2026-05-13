@@ -359,7 +359,7 @@ locals {
           "BackoffRate" : 2
         }
       ],
-      "Next" : local.run_glue_batch_job.StepName
+      "Next" : local.run_batch_processes.StepName
     }
   }
 
@@ -419,7 +419,44 @@ locals {
           "BackoffRate" : 2
         }
       ],
-      "Next" : var.split_pipeline ? local.set_dms_cdc_replication_task_start_time.StepName : local.run_glue_batch_job.StepName
+      "Next" : var.split_pipeline ? local.set_dms_cdc_replication_task_start_time.StepName : local.run_batch_processes.StepName
+    }
+  }
+
+  run_batch_processes = {
+    "StepName" : "Run Batch Processes",
+    "StepDefinition" : {
+      "Type" : "Parallel",
+      "InputPath" : "$",
+      "OutputPath" : "$",
+      "ResultPath" : "$.ParallelResultPath",
+      "Next" : local.proceed_to_streaming_process.StepName,
+      "Branches" : [
+        {
+          "StartAt" : "Run Glue Batch Job",
+          "States" : {
+            (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition
+          }
+        },
+        {
+          "StartAt" : "Delete Existing Reload Diffs",
+          "States" : {
+            (local.delete_existing_reload_diffs.StepName) : local.delete_existing_reload_diffs.StepDefinition,
+            (local.run_create_reload_diff_batch_job.StepName) : local.run_create_reload_diff_batch_job.StepDefinition,
+            (local.move_reload_diffs_toInsert_to_archive_bucket.StepName) : local.move_reload_diffs_toInsert_to_archive_bucket.StepDefinition,
+            (local.move_reload_diffs_toDelete_to_archive_bucket.StepName) : local.move_reload_diffs_toDelete_to_archive_bucket.StepDefinition,
+            (local.move_reload_diffs_toUpdate_to_archive_bucket.StepName) : local.move_reload_diffs_toUpdate_to_archive_bucket.StepDefinition,
+          }
+        }
+      ]
+    }
+  }
+
+  proceed_to_streaming_process = {
+    "StepName" : "Proceed To Streaming Process",
+    "StepDefinition" : {
+      "Type" : "Pass",
+      "Next" : local.empty_raw_data.StepName
     }
   }
 
@@ -452,7 +489,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.delete_existing_reload_diffs.StepName
+      "End" : true
     }
   }
 
@@ -564,7 +601,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.empty_raw_data.StepName
+      "End" : true
     }
   }
 
@@ -586,26 +623,24 @@ locals {
   }
 
   run_maintenance_jobs = {
-    "StepName" : "Compact And Vacuum",
+    "StepName" : "Compact",
     "StepDefinition" : {
       "Type" : "Parallel",
       "InputPath" : "$",
       "OutputPath" : "$",
       "ResultPath" : "$.ParallelResultPath",
-      "Next" : "Post Maintenance",
+      "Next" : local.post_maintenance.StepName,
       "Branches" : [
         {
           "StartAt" : "Run Compaction Job on Structured Zone",
           "States" : {
             (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-            (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
           }
         },
         {
           "StartAt" : "Run Compaction Job on Curated Zone",
           "States" : {
             (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-            (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
           }
         }
       ]
@@ -636,26 +671,6 @@ locals {
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
       },
-      "Next" : local.run_vacuum_job_on_structured_zone.StepName
-    }
-  }
-
-  run_vacuum_job_on_structured_zone = {
-    "StepName" : "Run Vacuum Job on Structured Zone",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_maintenance_retention_job,
-        "Arguments" : {
-          "--dpr.maintenance.root.path" : var.s3_structured_path,
-          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
-        },
-        "NumberOfWorkers" : var.retention_job_num_workers,
-        "WorkerType" : var.retention_job_worker_type
-      },
       "End" : true
     }
   }
@@ -675,26 +690,6 @@ locals {
         },
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
-      },
-      "Next" : local.run_vacuum_job_on_curated_zone.StepName
-    }
-  }
-
-  run_vacuum_job_on_curated_zone = {
-    "StepName" : "Run Vacuum Job on Curated Zone",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_maintenance_retention_job,
-        "Arguments" : {
-          "--dpr.maintenance.root.path" : var.s3_curated_path,
-          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
-        },
-        "NumberOfWorkers" : var.retention_job_num_workers,
-        "WorkerType" : var.retention_job_worker_type
       },
       "End" : true
     }

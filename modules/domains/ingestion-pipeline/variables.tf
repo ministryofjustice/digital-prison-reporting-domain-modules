@@ -244,11 +244,6 @@ variable "glue_switch_prisons_hive_data_location_job" {
   type        = string
 }
 
-variable "glue_maintenance_retention_job" {
-  description = "Name of glue job which vacuums the delta tables"
-  type        = string
-}
-
 variable "glue_maintenance_compaction_job" {
   description = "Name of glue job which compacts the delta tables"
   type        = string
@@ -282,28 +277,6 @@ variable "compaction_job_num_workers" {
 
   validation {
     condition     = var.compaction_job_num_workers >= 2
-    error_message = "Number of workers must be >= 2"
-  }
-}
-
-variable "retention_job_worker_type" {
-  description = "(Optional) Worker type to use for the retention job"
-  type        = string
-  default     = "G.1X"
-
-  validation {
-    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.retention_job_worker_type)
-    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
-  }
-}
-
-variable "retention_job_num_workers" {
-  description = "(Optional) Number of workers to use for the retention job. Must be >= 2"
-  type        = number
-  default     = 3
-
-  validation {
-    condition     = var.retention_job_num_workers >= 2
     error_message = "Number of workers must be >= 2"
   }
 }

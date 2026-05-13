@@ -177,14 +177,14 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Compact And Vacuum"
+          "Next" : "Compact"
         },
-        "Compact And Vacuum" : {
+        "Compact" : {
           "Type" : "Parallel",
           "InputPath" : "$",
           "OutputPath" : "$",
           "ResultPath" : "$.ParallelResultPath",
-          "Next" : "Start Glue Streaming Job",
+          "Next" : "Proceed To Streaming Process",
           "Branches" : [
             {
               "StartAt" : "Run Compaction Job on Structured Zone",
@@ -201,21 +201,6 @@ module "replay_pipeline" {
                     },
                     "NumberOfWorkers" : var.compaction_job_num_workers,
                     "WorkerType" : var.compaction_job_worker_type
-                  },
-                  "Next" : "Run Vacuum Job on Structured Zone"
-                },
-                "Run Vacuum Job on Structured Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_retention_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_structured_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.retention_job_num_workers,
-                    "WorkerType" : var.retention_job_worker_type
                   },
                   "End" : true
                 }
@@ -237,26 +222,28 @@ module "replay_pipeline" {
                     "NumberOfWorkers" : var.compaction_job_num_workers,
                     "WorkerType" : var.compaction_job_worker_type
                   },
-                  "Next" : "Run Vacuum Job on Curated Zone"
-                },
-                "Run Vacuum Job on Curated Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_retention_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_curated_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.retention_job_num_workers,
-                    "WorkerType" : var.retention_job_worker_type
-                  },
                   "End" : true
                 }
               }
             }
           ]
+        },
+        "Proceed To Streaming Process" : {
+          "Type" : "Pass",
+          "Next" : "Delete Load Files From Raw Zone"
+        },
+        "Delete Load Files From Raw Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_s3_data_deletion_job,
+            "Arguments" : {
+              "--dpr.file.deletion.buckets" : var.s3_raw_bucket_id,
+              "--dpr.config.key" : var.domain,
+              "--dpr.allowed.s3.file.regex" : "LOAD*parquet"
+            }
+          },
+          "Next" : "Start Glue Streaming Job"
         },
         "Start Glue Streaming Job" : {
           "Type" : "Task",

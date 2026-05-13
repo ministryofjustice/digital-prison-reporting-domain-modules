@@ -371,26 +371,24 @@ locals {
   }
 
   run_maintenance_jobs = {
-    "StepName" : "Compact And Vacuum",
+    "StepName" : "Compact",
     "StepDefinition" : {
       "Type" : "Parallel",
       "InputPath" : "$",
       "OutputPath" : "$",
       "ResultPath" : "$.ParallelResultPath",
-      "Next" : "Post Maintenance",
+      "Next" : local.post_maintenance.StepName,
       "Branches" : [
         {
           "StartAt" : "Run Compaction Job on Structured Zone",
           "States" : {
-            (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-            (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
+            (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition
           }
         },
         {
           "StartAt" : "Run Compaction Job on Curated Zone",
           "States" : {
-            (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-            (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+            (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition
           }
         }
       ]
@@ -422,26 +420,6 @@ locals {
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
       },
-      "Next" : local.run_vacuum_job_on_structured_zone.StepName
-    }
-  }
-
-  run_vacuum_job_on_structured_zone = {
-    "StepName" : "Run Vacuum Job on Structured Zone",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_maintenance_retention_job,
-        "Arguments" : {
-          "--dpr.maintenance.root.path" : var.s3_structured_path,
-          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
-        },
-        "NumberOfWorkers" : var.retention_job_num_workers,
-        "WorkerType" : var.retention_job_worker_type
-      },
       "End" : true
     }
   }
@@ -462,26 +440,6 @@ locals {
         },
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
-      },
-      "Next" : local.run_vacuum_job_on_curated_zone.StepName
-    }
-  }
-
-  run_vacuum_job_on_curated_zone = {
-    "StepName" : "Run Vacuum Job on Curated Zone",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_maintenance_retention_job,
-        "Arguments" : {
-          "--dpr.maintenance.root.path" : var.s3_curated_path,
-          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
-        },
-        "NumberOfWorkers" : var.retention_job_num_workers,
-        "WorkerType" : var.retention_job_worker_type
       },
       "End" : true
     }
