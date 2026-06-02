@@ -5,6 +5,8 @@ resource "aws_iam_role" "dms-s3-role" {
   name = "${var.project_id}-dms-${var.short_name}-s3-endpoint-role"
   path = "/"
 
+  max_session_duration = var.max_session_duration_seconds
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -58,6 +60,8 @@ resource "aws_iam_role" "dms-operator-s3-target-role" {
 
   name = "${var.project_id}-dms-${var.short_name}-operator-s3-target-role"
   path = "/"
+
+  max_session_duration = var.max_session_duration_seconds
 
   assume_role_policy = <<EOF
 {
