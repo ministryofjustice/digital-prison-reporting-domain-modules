@@ -15,6 +15,7 @@ module "dms_instance" {
   short_name                   = var.short_name
   allow_major_version_upgrade  = var.allow_major_version_upgrade
   custom_metric_namespace      = var.custom_metric_namespace
+  max_session_duration_seconds = null
 
   dms_log_retention_in_days = var.dms_log_retention_in_days
 
