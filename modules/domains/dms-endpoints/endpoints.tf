@@ -23,6 +23,7 @@ module "dms_endpoints" {
   bucket_name                         = var.bucket_name
   source_postgres_heartbeat_enable    = var.source_postgres_heartbeat_enable
   source_postgres_heartbeat_frequency = var.source_postgres_heartbeat_frequency
+  max_session_duration_seconds        = var.max_session_duration_seconds
 
   tags = var.tags
 }

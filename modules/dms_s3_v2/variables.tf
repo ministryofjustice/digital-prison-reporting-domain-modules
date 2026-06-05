@@ -269,3 +269,8 @@ variable "cdc_max_batch_interval" {
   type        = number
   default     = 10
 }
+
+variable "max_session_duration_seconds" {
+  description = "The maximum duration in seconds for the DMS endpoint session token expiry"
+  type        = number
+}
