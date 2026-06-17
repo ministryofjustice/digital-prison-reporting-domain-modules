@@ -415,7 +415,7 @@ locals {
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain,
-          "--dpr.maintenance.full.compaction" : "true"
+          "--dpr.maintenance.full.compaction" : "false"
         },
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
@@ -436,7 +436,7 @@ locals {
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain,
-          "--dpr.maintenance.full.compaction" : "true"
+          "--dpr.maintenance.full.compaction" : "false"
         },
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
