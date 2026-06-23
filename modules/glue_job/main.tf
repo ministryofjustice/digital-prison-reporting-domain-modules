@@ -59,7 +59,7 @@ resource "aws_glue_job" "glue_job" {
 ### Glue Job Service Role
 resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
-  name  = "${var.name}-glue-role"
+  name  = "${var.short_name}-glue-role"
   tags  = local.tags
   path  = "/"
 
