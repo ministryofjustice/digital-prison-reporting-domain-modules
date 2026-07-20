@@ -44,18 +44,6 @@ module "replay_pipeline" {
               "--dpr.dms.replication.task.id" : var.replication_task_id
             }
           },
-          "Next" : "Check All Pending Files Have Been Processed"
-        },
-        "Check All Pending Files Have Been Processed" : {
-          "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-          "Parameters" : {
-            "JobName" : var.glue_unprocessed_raw_files_check_job,
-            "Arguments" : {
-              "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
-              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts)
-            }
-          },
           "Next" : "Stop Glue Streaming Job"
         },
         "Stop Glue Streaming Job" : {

@@ -41,7 +41,7 @@ locals {
           "--dpr.dms.replication.task.id" : var.cdc_replication_task_id
         }
       },
-      "Next" : local.check_all_pending_files_have_been_processed.StepName
+      "Next" : local.stop_glue_streaming_job.StepName
     }
   }
 
@@ -56,23 +56,7 @@ locals {
           "--dpr.dms.replication.task.id" : var.replication_task_id
         }
       },
-      "Next" : var.batch_only ? local.update_hive_tables.StepName : local.check_all_pending_files_have_been_processed.StepName
-    }
-  }
-
-  check_all_pending_files_have_been_processed = {
-    "StepName" : "Check All Pending Files Have Been Processed",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_unprocessed_raw_files_check_job,
-        "Arguments" : {
-          "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
-          "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts)
-        }
-      },
-      "Next" : local.stop_glue_streaming_job.StepName
+      "Next" : var.batch_only ? local.update_hive_tables.StepName : local.stop_glue_streaming_job.StepName
     }
   }
 
