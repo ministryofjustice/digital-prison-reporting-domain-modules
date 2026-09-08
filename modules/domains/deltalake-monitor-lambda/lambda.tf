@@ -1,15 +1,11 @@
 # Lambda that reads Delta Lake table metadata from the curated bucket and reports metrics
 
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
 locals {
   curated_bucket_read_policy_name = "${var.name}-curated-bucket-read-policy"
   dms_describe_policy_name        = "${var.name}-dms-describe-policy"
 
-  curated_bucket_read_policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.curated_bucket_read_policy_name}"
-  dms_describe_policy_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.dms_describe_policy_name}"
+  curated_bucket_read_policy_arn = "arn:aws:iam::${var.account}:policy/${local.curated_bucket_read_policy_name}"
+  dms_describe_policy_arn        = "arn:aws:iam::${var.account}:policy/${local.dms_describe_policy_name}"
 }
 
 # Read access to the curated bucket so the lambda can discover and read Delta Lake table data/metadata
@@ -53,7 +49,7 @@ resource "aws_iam_policy" "dms_describe" {
           "dms:DescribeReplicationTasks",
           "dms:DescribeTableStatistics",
         ]
-        Resource = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*:*"
+        Resource = "arn:aws:dms:${var.region}:${var.account}:*:*"
       },
     ]
   })

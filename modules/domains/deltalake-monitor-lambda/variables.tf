@@ -3,6 +3,16 @@ variable "enable" {
   description = "Whether to enable the lambda related resources or not"
 }
 
+variable "region" {
+  type        = string
+  description = "Current AWS Region."
+}
+
+variable "account" {
+  type        = string
+  description = "AWS Account ID."
+}
+
 variable "name" {
   description = "Name for the Lambda"
   type        = string
