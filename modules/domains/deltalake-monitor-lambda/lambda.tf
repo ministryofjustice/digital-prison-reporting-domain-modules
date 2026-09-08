@@ -4,11 +4,19 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+locals {
+  curated_bucket_read_policy_name = "${var.name}-curated-bucket-read-policy"
+  dms_describe_policy_name        = "${var.name}-dms-describe-policy"
+
+  curated_bucket_read_policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.curated_bucket_read_policy_name}"
+  dms_describe_policy_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.dms_describe_policy_name}"
+}
+
 # Read access to the curated bucket so the lambda can discover and read Delta Lake table data/metadata
 resource "aws_iam_policy" "curated_bucket_read" {
   count = var.enable ? 1 : 0
 
-  name = "${var.name}-curated-bucket-read-policy"
+  name = local.curated_bucket_read_policy_name
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -35,7 +43,7 @@ resource "aws_iam_policy" "curated_bucket_read" {
 resource "aws_iam_policy" "dms_describe" {
   count = var.enable ? 1 : 0
 
-  name = "${var.name}-dms-describe-policy"
+  name = local.dms_describe_policy_name
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -63,7 +71,7 @@ module "deltalake_monitor_lambda" {
   s3_key        = var.lambda_code_s3_key
   handler       = var.lambda_handler
   runtime       = var.lambda_runtime
-  policies      = concat(var.enable ? [aws_iam_policy.curated_bucket_read[0].arn, aws_iam_policy.dms_describe[0].arn] : [], var.policies)
+  policies      = concat(var.enable ? [local.curated_bucket_read_policy_arn, local.dms_describe_policy_arn] : [], var.policies)
   tracing       = var.lambda_tracing
   timeout       = var.lambda_timeout_in_seconds
   memory_size   = var.memory_size_mb
@@ -86,4 +94,6 @@ module "deltalake_monitor_lambda" {
       Name          = var.name
     }
   )
+
+  depends_on = [aws_iam_policy.curated_bucket_read, aws_iam_policy.dms_describe]
 }
