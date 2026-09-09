@@ -2,9 +2,11 @@
 
 locals {
   curated_bucket_read_policy_name = "${var.name}-curated-bucket-read-policy"
+  config_bucket_read_policy_name  = "${var.name}-config-bucket-read-policy"
   dms_describe_policy_name        = "${var.name}-dms-describe-policy"
 
   curated_bucket_read_policy_arn = "arn:aws:iam::${var.account}:policy/${local.curated_bucket_read_policy_name}"
+  config_bucket_read_policy_arn  = "arn:aws:iam::${var.account}:policy/${local.config_bucket_read_policy_name}"
   dms_describe_policy_arn        = "arn:aws:iam::${var.account}:policy/${local.dms_describe_policy_name}"
 }
 
@@ -29,6 +31,32 @@ resource "aws_iam_policy" "curated_bucket_read" {
           "s3:ListBucket",
         ]
         Resource = "arn:aws:s3:::${var.curated_bucket_name}"
+      },
+    ]
+  })
+}
+
+# Read access to the config bucket so the lambda can retrieve domain config files
+resource "aws_iam_policy" "config_bucket_read" {
+  count = var.enable ? 1 : 0
+
+  name = local.config_bucket_read_policy_name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+        ]
+        Resource = "arn:aws:s3:::${var.config_bucket_name}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+        ]
+        Resource = "arn:aws:s3:::${var.config_bucket_name}"
       },
     ]
   })
@@ -67,7 +95,7 @@ module "deltalake_monitor_lambda" {
   s3_key        = var.lambda_code_s3_key
   handler       = var.lambda_handler
   runtime       = var.lambda_runtime
-  policies      = concat(var.enable ? [local.curated_bucket_read_policy_arn, local.dms_describe_policy_arn] : [], var.policies)
+  policies      = concat(var.enable ? [local.curated_bucket_read_policy_arn, local.config_bucket_read_policy_arn, local.dms_describe_policy_arn] : [], var.policies)
   tracing       = var.lambda_tracing
   timeout       = var.lambda_timeout_in_seconds
   memory_size   = var.memory_size_mb
@@ -92,5 +120,5 @@ module "deltalake_monitor_lambda" {
     }
   )
 
-  depends_on = [aws_iam_policy.curated_bucket_read, aws_iam_policy.dms_describe]
+  depends_on = [aws_iam_policy.curated_bucket_read, aws_iam_policy.config_bucket_read, aws_iam_policy.dms_describe]
 }
