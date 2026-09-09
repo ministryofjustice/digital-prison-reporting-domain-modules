@@ -73,7 +73,9 @@ module "deltalake_monitor_lambda" {
   memory_size   = var.memory_size_mb
 
   env_vars = {
-    CURATED_BUCKET = var.curated_bucket_name
+    CURATED_ZONE_S3_BUCKET = var.curated_bucket_name
+    CONFIG_S3_BUCKET       = var.config_bucket_name
+    AWS_REGION             = var.region
   }
 
   log_retention_in_days = var.lambda_log_retention_in_days

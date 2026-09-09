@@ -33,6 +33,11 @@ variable "curated_bucket_name" {
   type        = string
 }
 
+variable "config_bucket_name" {
+  description = "The name of the bucket containing domain config files"
+  type        = string
+}
+
 variable "lambda_handler" {
   description = "Delta Lake Monitor Lambda Handler"
   type        = string
