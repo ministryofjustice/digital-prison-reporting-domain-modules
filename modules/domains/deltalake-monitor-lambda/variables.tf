@@ -36,7 +36,7 @@ variable "curated_bucket_name" {
 variable "lambda_handler" {
   description = "Delta Lake Monitor Lambda Handler"
   type        = string
-  default     = "deltalake_monitor.lambda_handler"
+  default     = "hmpps_datahub_deltalake_monitor_lambda.main.lambda_handler"
 }
 
 variable "lambda_runtime" {
