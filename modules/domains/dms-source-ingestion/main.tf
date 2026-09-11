@@ -11,15 +11,15 @@ module "dms_core" {
   }
 
   replication_instance = {
-    replication_instance_id          = "${var.name}-instance-${var.env}"
-    replication_instance_class       = var.replication_instance_class
-    allocated_storage                = var.replication_instance_storage
-    engine_version                   = var.replication_instance_version
-    subnet_ids                       = var.subnet_ids
-    multi_az                         = true
-    apply_immediately                = true
-    auto_minor_version_upgrade       = false
-    preferred_maintenance_window     = var.replication_instance_maintenance_window
+    replication_instance_id      = "${var.name}-instance-${var.env}"
+    replication_instance_class   = var.replication_instance_class
+    allocated_storage            = var.replication_instance_storage
+    engine_version               = var.replication_instance_version
+    subnet_ids                   = var.subnet_ids
+    multi_az                     = true
+    apply_immediately            = true
+    auto_minor_version_upgrade   = false
+    preferred_maintenance_window = var.replication_instance_maintenance_window
   }
 
   source_endpoint = {
