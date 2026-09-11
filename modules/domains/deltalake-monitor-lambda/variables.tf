@@ -97,3 +97,30 @@ variable "tags" {
   default     = {}
   description = "(Optional) Key-value map of resource tags."
 }
+
+variable "domain_schedules" {
+  description = <<-EOT
+    Map keyed by domain name, each entry configuring a scheduled invocation of the
+    deltalake monitor lambda for that domain. The map key is used as the "domain" field
+    of the invocation payload, e.g.:
+      { "reference" = { schedule_expression = "rate(1 day)", target_size_bytes = 64000000 } }
+    invokes the lambda with {"domain": "reference", "target_size_bytes": 64000000}.
+  EOT
+  type = map(object({
+    schedule_expression = string
+    target_size_bytes   = number
+    enabled             = optional(bool, true)
+    timezone            = optional(string, "UTC")
+  }))
+  default = {}
+
+  validation {
+    condition     = alltrue([for d in values(var.domain_schedules) : can(regex("^(rate|cron)\\(.+\\)$", d.schedule_expression))])
+    error_message = "Each domain's schedule_expression must be a valid EventBridge rate(...) or cron(...) expression."
+  }
+
+  validation {
+    condition     = alltrue([for d in values(var.domain_schedules) : d.target_size_bytes > 0])
+    error_message = "target_size_bytes must be a positive number for every domain."
+  }
+}
