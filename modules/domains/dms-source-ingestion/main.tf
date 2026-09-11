@@ -4,12 +4,6 @@ module "dms_core" {
   name   = var.name
   vpc_id = var.vpc_id
 
-  security_group = {
-    additional_vpc_security_group_ids = [
-      aws_security_group.dms_source_ingestion.id
-    ]
-  }
-
   replication_instance = {
     replication_instance_id      = "${var.name}-instance-${var.env}"
     replication_instance_class   = var.replication_instance_class

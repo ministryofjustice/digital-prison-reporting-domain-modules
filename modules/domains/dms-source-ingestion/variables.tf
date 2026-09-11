@@ -30,12 +30,6 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "vpc_cidr" {
-  description = "CIDR ranges used for DPR-specific DMS network access."
-  type        = list(string)
-  default     = null
-}
-
 variable "subnet_ids" {
   description = "Subnet IDs used by the DMS replication subnet group."
   type        = list(string)
