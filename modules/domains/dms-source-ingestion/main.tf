@@ -1,5 +1,5 @@
 module "dms_core" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/database-migration-service/modules/dms-core?ref=integration/data-hub-modularisation"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/dms-core?ref=268b9f51e0e36f3a897cbdd5092751baa11e07b1"
 
   name   = var.name
   vpc_id = var.vpc_id
@@ -17,20 +17,21 @@ module "dms_core" {
   }
 
   source_endpoint = {
-    endpoint_id = "${var.name}-source"
+    endpoint_id = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source-endpoint"
     engine_name = var.source_engine_name
 
     database_name = var.source_db_name
 
     secrets_manager_arn             = var.source_secrets_manager_arn
     secrets_manager_access_role_arn = var.source_secrets_manager_access_role_arn
+    secrets_manager_kms_key_arn = var.source_secrets_manager_kms_key_arn
 
     ssl_mode                    = var.source_ssl_mode
     extra_connection_attributes = var.source_extra_connection_attributes
   }
 
   s3_target_endpoint = {
-    endpoint_id             = "${var.name}-s3"
+    endpoint_id             = "${var.project_id}-dms-${var.short_name}-s3-target-endpoint"
     bucket_name             = var.target_bucket_name
     service_access_role_arn = var.target_service_access_role_arn
 

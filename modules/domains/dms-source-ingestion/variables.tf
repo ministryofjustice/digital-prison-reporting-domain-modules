@@ -3,6 +3,11 @@ variable "name" {
   type        = string
 }
 
+variable "dms_source_name" {
+  description = "Short source identifier used in the existing DPR DMS endpoint naming convention, for example oracle or pgres."
+  type        = string
+}
+
 variable "project_id" {
   description = "DPR project identifier."
   type        = string
@@ -58,6 +63,11 @@ variable "replication_instance_maintenance_window" {
 variable "source_engine_name" {
   description = "Source database engine. Supported DPR sources are Oracle and PostgreSQL."
   type        = string
+
+  validation {
+    condition     = contains(["oracle", "postgres"], var.source_engine_name)
+    error_message = "source_engine_name must be either 'oracle' or 'postgres'."
+  }
 }
 
 variable "source_db_name" {
@@ -84,6 +94,12 @@ variable "source_secrets_manager_arn" {
 
 variable "source_secrets_manager_access_role_arn" {
   description = "IAM role used by DMS to access the source database secret."
+  type        = string
+  default     = null
+}
+
+variable "source_secrets_manager_kms_key_arn" {
+  description = "KMS key ARN used to decrypt the source database secret, where required."
   type        = string
   default     = null
 }
