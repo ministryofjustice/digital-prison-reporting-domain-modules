@@ -24,7 +24,7 @@ module "dms_core" {
 
     secrets_manager_arn             = var.source_secrets_manager_arn
     secrets_manager_access_role_arn = var.source_secrets_manager_access_role_arn
-    secrets_manager_kms_key_arn = var.source_secrets_manager_kms_key_arn
+    secrets_manager_kms_key_arn     = var.source_secrets_manager_kms_key_arn
 
     ssl_mode                    = var.source_ssl_mode
     extra_connection_attributes = var.source_extra_connection_attributes
