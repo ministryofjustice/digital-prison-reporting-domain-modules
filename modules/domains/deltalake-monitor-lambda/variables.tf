@@ -98,6 +98,16 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
+variable "s3_list_cutoff_file_count" {
+  description = "The maximum number of files the lambda will count when listing an S3 prefix for a table before stopping, to avoid spending too long listing prefixes with very many files."
+  type        = number
+}
+
+variable "s3_list_time_cutoff_seconds" {
+  description = "The maximum number of seconds the lambda will spend listing an S3 prefix for a table before stopping, to avoid spending too long listing prefixes with very many files."
+  type        = number
+}
+
 variable "domain_schedules" {
   description = <<-EOT
     Map keyed by domain name, each entry configuring a scheduled invocation of the
