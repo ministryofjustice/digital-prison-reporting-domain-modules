@@ -63,21 +63,53 @@ variable "lambda_tracing" {
 }
 
 variable "lambda_log_retention_in_days" {
-  description = "Lambda log retention in number of days."
+  description = "Lambda log retention in number of days. The top-N and domain reports query the last 7 days of monitor logs, so this must be at least 7."
   type        = number
   default     = 7
+
+  validation {
+    condition     = var.lambda_log_retention_in_days >= 7
+    error_message = "lambda_log_retention_in_days must be at least 7, because the report modes look back 7 days through the monitor logs."
+  }
 }
 
 variable "lambda_timeout_in_seconds" {
-  description = "Lambda timeout in seconds."
+  description = "Lambda timeout in seconds. Report modes can take several minutes, as they make multiple Bedrock calls."
   type        = number
-  default     = 300
+  default     = 900
 }
 
 variable "memory_size_mb" {
-  description = "Amount of memory to allocate to the lambda function."
+  description = "Amount of memory to allocate to the lambda function. Report modes hold per-file stats in memory (roughly 8KB per active file)."
   type        = number
-  default     = 256
+  default     = 512
+}
+
+variable "environment" {
+  description = "Environment name (development, test, preproduction or production). The report modes use it to find each domain's CDC Glue job, named dpr-cdc-<domain>-<environment>."
+  type        = string
+
+  validation {
+    condition     = contains(["development", "test", "preproduction", "production"], var.environment)
+    error_message = "environment must be one of development, test, preproduction or production."
+  }
+}
+
+variable "report_s3_bucket_name" {
+  description = "The bucket the report modes write markdown reports to, under the deltalake-monitoring-reports/ prefix."
+  type        = string
+}
+
+variable "bedrock_model_id" {
+  description = "Bedrock inference profile ID the report modes call to diagnose tables. Passed to the lambda as BEDROCK_MODEL_ID and used to scope its Bedrock permissions."
+  type        = string
+  default     = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+}
+
+variable "bedrock_foundation_model_id" {
+  description = "The foundation model that bedrock_model_id's inference profile routes to. The lambda needs permission on this model as well as the profile. Change the two together."
+  type        = string
+  default     = "anthropic.claude-sonnet-4-5-20250929-v1:0"
 }
 
 variable "subnet_ids" {
