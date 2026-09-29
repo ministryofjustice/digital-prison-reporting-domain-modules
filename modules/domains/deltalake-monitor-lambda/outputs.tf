@@ -7,6 +7,11 @@ output "lambda_name" {
   value       = var.enable ? module.deltalake_monitor_lambda.lambda_name : ""
 }
 
+output "log_group_name" {
+  description = "The lambda's log group."
+  value       = local.monitor_log_group
+}
+
 output "domain_schedule_arns" {
   description = "Map of domain name to the ARN of its EventBridge schedule."
   value       = { for k, m in module.deltalake_monitor_schedule : k => m.schedule_arn }
