@@ -103,13 +103,13 @@ variable "report_s3_bucket_name" {
 variable "bedrock_model_id" {
   description = "Bedrock inference profile ID the report modes call to diagnose tables. Passed to the lambda as BEDROCK_MODEL_ID and used to scope its Bedrock permissions."
   type        = string
-  default     = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  default     = "eu.anthropic.claude-opus-5-5"
 }
 
 variable "bedrock_foundation_model_id" {
   description = "The foundation model that bedrock_model_id's inference profile routes to. The lambda needs permission on this model as well as the profile. Change the two together."
   type        = string
-  default     = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+  default     = "anthropic.claude-opus-5-5"
 }
 
 variable "subnet_ids" {
