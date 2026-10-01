@@ -9,6 +9,7 @@ module "dms_instance" {
   replication_instance_version = var.replication_instance_version
   replication_instance_class   = var.replication_instance_class
   replication_instance_storage = var.replication_instance_storage
+  availability_zone            = var.availability_zone
   subnet_ids                   = var.subnet_ids
   vpc_cidr                     = var.vpc_cidr
   vpc                          = var.vpc
