@@ -75,6 +75,12 @@ variable "allow_major_version_upgrade" {
   default     = false
 }
 
+variable "availability_zone" {
+  type        = string
+  default     = null
+  description = "(Optional) The availability zone to create the DMS Instance in"
+}
+
 variable "dms_log_retention_in_days" {
   type        = number
   default     = 14
