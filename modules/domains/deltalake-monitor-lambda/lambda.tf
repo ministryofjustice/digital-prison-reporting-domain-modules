@@ -2,15 +2,15 @@
 # It can also be run to diagnose troublesome tables, writing markdown reports to S3.
 
 locals {
-  curated_bucket_read_policy_name = "${var.name}-curated-bucket-read-policy"
-  config_bucket_read_policy_name  = "${var.name}-config-bucket-read-policy"
-  dms_describe_policy_name        = "${var.name}-dms-describe-policy"
-  report_modes_policy_name        = "${var.name}-report-modes-policy"
+  curated_bucket_read_policy_name  = "${var.name}-curated-bucket-read-policy"
+  config_bucket_read_policy_name      = "${var.name}-config-bucket-read-policy"
+  dms_describe_policy_name            = "${var.name}-dms-describe-policy"
+  report_modes_policy_name            = "${var.name}-report-modes-policy"
 
   curated_bucket_read_policy_arn = "arn:aws:iam::${var.account}:policy/${local.curated_bucket_read_policy_name}"
-  config_bucket_read_policy_arn  = "arn:aws:iam::${var.account}:policy/${local.config_bucket_read_policy_name}"
-  dms_describe_policy_arn        = "arn:aws:iam::${var.account}:policy/${local.dms_describe_policy_name}"
-  report_modes_policy_arn        = "arn:aws:iam::${var.account}:policy/${local.report_modes_policy_name}"
+  config_bucket_read_policy_arn     = "arn:aws:iam::${var.account}:policy/${local.config_bucket_read_policy_name}"
+  dms_describe_policy_arn           = "arn:aws:iam::${var.account}:policy/${local.dms_describe_policy_name}"
+  report_modes_policy_arn           = "arn:aws:iam::${var.account}:policy/${local.report_modes_policy_name}"
 
   monitor_log_group = "/aws/lambda/${var.name}-function"
 
@@ -170,7 +170,7 @@ module "deltalake_monitor_lambda" {
   memory_size   = var.memory_size_mb
 
   env_vars = {
-    CURATED_ZONE_S3_BUCKET      = var.curated_bucket_name
+    CURATED_ZONE_S3_BUCKET   = var.curated_bucket_name
     CONFIG_S3_BUCKET            = var.config_bucket_name
     S3_LIST_CUTOFF_FILE_COUNT   = tostring(var.s3_list_cutoff_file_count)
     S3_LIST_TIME_CUTOFF_SECONDS = tostring(var.s3_list_time_cutoff_seconds)
