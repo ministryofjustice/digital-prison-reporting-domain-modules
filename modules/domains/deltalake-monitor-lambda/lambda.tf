@@ -1,27 +1,27 @@
-# Lambda that reads Delta Lake table metadata from the curated bucket and reports metrics.
+# Lambda that reads Delta Lake table metadata from the structured bucket and reports metrics.
 # It can also be run to diagnose troublesome tables, writing markdown reports to S3.
 
 locals {
-  curated_bucket_read_policy_name = "${var.name}-curated-bucket-read-policy"
-  config_bucket_read_policy_name  = "${var.name}-config-bucket-read-policy"
-  dms_describe_policy_name        = "${var.name}-dms-describe-policy"
-  report_modes_policy_name        = "${var.name}-report-modes-policy"
+  structured_bucket_read_policy_name  = "${var.name}-strcutured-bucket-read-policy"
+  config_bucket_read_policy_name      = "${var.name}-config-bucket-read-policy"
+  dms_describe_policy_name            = "${var.name}-dms-describe-policy"
+  report_modes_policy_name            = "${var.name}-report-modes-policy"
 
-  curated_bucket_read_policy_arn = "arn:aws:iam::${var.account}:policy/${local.curated_bucket_read_policy_name}"
-  config_bucket_read_policy_arn  = "arn:aws:iam::${var.account}:policy/${local.config_bucket_read_policy_name}"
-  dms_describe_policy_arn        = "arn:aws:iam::${var.account}:policy/${local.dms_describe_policy_name}"
-  report_modes_policy_arn        = "arn:aws:iam::${var.account}:policy/${local.report_modes_policy_name}"
+  structured_bucket_read_policy_arn = "arn:aws:iam::${var.account}:policy/${local.structured_bucket_read_policy_name}"
+  config_bucket_read_policy_arn     = "arn:aws:iam::${var.account}:policy/${local.config_bucket_read_policy_name}"
+  dms_describe_policy_arn           = "arn:aws:iam::${var.account}:policy/${local.dms_describe_policy_name}"
+  report_modes_policy_arn           = "arn:aws:iam::${var.account}:policy/${local.report_modes_policy_name}"
 
   monitor_log_group = "/aws/lambda/${var.name}-function"
 
   report_s3_prefix = "deltalake-monitoring-reports"
 }
 
-# Read access to the curated bucket so the lambda can discover and read Delta Lake table data/metadata
-resource "aws_iam_policy" "curated_bucket_read" {
+# Read access to the structured bucket so the lambda can discover and read Delta Lake table data/metadata
+resource "aws_iam_policy" "structured_bucket_read" {
   count = var.enable ? 1 : 0
 
-  name = local.curated_bucket_read_policy_name
+  name = local.structured_bucket_read_policy_name
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -30,14 +30,14 @@ resource "aws_iam_policy" "curated_bucket_read" {
         Action = [
           "s3:GetObject",
         ]
-        Resource = "arn:aws:s3:::${var.curated_bucket_name}/*"
+        Resource = "arn:aws:s3:::${var.structured_bucket_name}/*"
       },
       {
         Effect = "Allow"
         Action = [
           "s3:ListBucket",
         ]
-        Resource = "arn:aws:s3:::${var.curated_bucket_name}"
+        Resource = "arn:aws:s3:::${var.structured_bucket_name}"
       },
     ]
   })
@@ -164,13 +164,13 @@ module "deltalake_monitor_lambda" {
   s3_key        = var.lambda_code_s3_key
   handler       = var.lambda_handler
   runtime       = var.lambda_runtime
-  policies      = concat(var.enable ? [local.curated_bucket_read_policy_arn, local.config_bucket_read_policy_arn, local.dms_describe_policy_arn, local.report_modes_policy_arn] : [], var.policies)
+  policies      = concat(var.enable ? [local.structured_bucket_read_policy_arn, local.config_bucket_read_policy_arn, local.dms_describe_policy_arn, local.report_modes_policy_arn] : [], var.policies)
   tracing       = var.lambda_tracing
   timeout       = var.lambda_timeout_in_seconds
   memory_size   = var.memory_size_mb
 
   env_vars = {
-    CURATED_ZONE_S3_BUCKET      = var.curated_bucket_name
+    STRUCTURED_ZONE_S3_BUCKET   = var.structured_bucket_name
     CONFIG_S3_BUCKET            = var.config_bucket_name
     S3_LIST_CUTOFF_FILE_COUNT   = tostring(var.s3_list_cutoff_file_count)
     S3_LIST_TIME_CUTOFF_SECONDS = tostring(var.s3_list_time_cutoff_seconds)
@@ -196,5 +196,5 @@ module "deltalake_monitor_lambda" {
     }
   )
 
-  depends_on = [aws_iam_policy.curated_bucket_read, aws_iam_policy.config_bucket_read, aws_iam_policy.dms_describe, aws_iam_policy.report_modes]
+  depends_on = [aws_iam_policy.structured_bucket_read, aws_iam_policy.config_bucket_read, aws_iam_policy.dms_describe, aws_iam_policy.report_modes]
 }
