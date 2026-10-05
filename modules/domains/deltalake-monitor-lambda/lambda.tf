@@ -2,10 +2,10 @@
 # It can also be run to diagnose troublesome tables, writing markdown reports to S3.
 
 locals {
-  structured_bucket_read_policy_name  = "${var.name}-strcutured-bucket-read-policy"
-  config_bucket_read_policy_name      = "${var.name}-config-bucket-read-policy"
-  dms_describe_policy_name            = "${var.name}-dms-describe-policy"
-  report_modes_policy_name            = "${var.name}-report-modes-policy"
+  structured_bucket_read_policy_name = "${var.name}-strcutured-bucket-read-policy"
+  config_bucket_read_policy_name     = "${var.name}-config-bucket-read-policy"
+  dms_describe_policy_name           = "${var.name}-dms-describe-policy"
+  report_modes_policy_name           = "${var.name}-report-modes-policy"
 
   structured_bucket_read_policy_arn = "arn:aws:iam::${var.account}:policy/${local.structured_bucket_read_policy_name}"
   config_bucket_read_policy_arn     = "arn:aws:iam::${var.account}:policy/${local.config_bucket_read_policy_name}"
