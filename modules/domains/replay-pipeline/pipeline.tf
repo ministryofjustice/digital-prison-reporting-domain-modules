@@ -67,15 +67,15 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Copy Curated Data to Temp-Reload Bucket"
+          "Next" : "Copy Structured Data to Temp-Reload Bucket"
         },
-        "Copy Curated Data to Temp-Reload Bucket" : {
+        "Copy Structured Data to Temp-Reload Bucket" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_s3_file_transfer_job,
             "Arguments" : {
-              "--dpr.file.transfer.source.bucket" : var.s3_curated_bucket_id,
+              "--dpr.file.transfer.source.bucket" : var.s3_structured_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_temp_reload_bucket_id,
               "--dpr.file.transfer.delete.copied.files" : "false",
               "--dpr.file.transfer.use.default.parallelism" : tostring(var.file_transfer_use_default_parallelism),
@@ -99,15 +99,15 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Empty Structured and Curated Data"
+          "Next" : "Empty Structured Data"
         },
-        "Empty Structured and Curated Data" : {
+        "Empty Structured Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
-              "--dpr.file.deletion.buckets" : "${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+              "--dpr.file.deletion.buckets" : var.s3_structured_bucket_id,
               "--dpr.config.key" : var.domain
             }
           },
@@ -195,15 +195,15 @@ module "replay_pipeline" {
               }
             },
             {
-              "StartAt" : "Run Compaction Job on Curated Zone",
+              "StartAt" : "Run Compaction Job on Structured Zone",
               "States" : {
-                "Run Compaction Job on Curated Zone" : {
+                "Run Compaction Job on Structured Zone" : {
                   "Type" : "Task",
                   "Resource" : "arn:aws:states:::glue:startJobRun.sync",
                   "Parameters" : {
                     "JobName" : var.glue_maintenance_compaction_job,
                     "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_curated_path,
+                      "--dpr.maintenance.root.path" : var.s3_structured_path,
                       "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
                       "--dpr.config.key" : var.domain
                     },
@@ -278,15 +278,15 @@ module "replay_pipeline" {
             "ReplicationTaskArn" : var.dms_replication_task_arn,
             "StartReplicationTaskType" : "resume-processing"
           },
-          "Next" : "Switch Hive Tables for Prisons to Curated"
+          "Next" : "Switch Hive Tables for Prisons to Structured"
         },
-        "Switch Hive Tables for Prisons to Curated" : {
+        "Switch Hive Tables for Prisons to Structured" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_switch_prisons_hive_data_location_job,
             "Arguments" : {
-              "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
+              "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_structured_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },

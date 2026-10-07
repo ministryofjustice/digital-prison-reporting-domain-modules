@@ -201,19 +201,19 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.copy_curated_data_to_temp_reload_bucket.StepName
+      "Next" : local.copy_structured_data_to_temp_reload_bucket.StepName
     }
   }
 
-  copy_curated_data_to_temp_reload_bucket = {
-    "StepName" : "Copy Curated Data to Temp-Reload Bucket",
+  copy_structured_data_to_temp_reload_bucket = {
+    "StepName" : "Copy Structured Data to Temp-Reload Bucket",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
         "JobName" : var.glue_s3_file_transfer_job,
         "Arguments" : {
-          "--dpr.file.transfer.source.bucket" : var.s3_curated_bucket_id,
+          "--dpr.file.transfer.source.bucket" : var.s3_structured_bucket_id,
           "--dpr.file.transfer.destination.bucket" : var.s3_temp_reload_bucket_id,
           "--dpr.file.transfer.retention.period.amount" : "0",
           "--dpr.file.transfer.delete.copied.files" : "false",
@@ -244,19 +244,19 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_structured_and_curated_data.StepName : local.empty_raw_structured_and_curated_data.StepName
+      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_and_structured_data.StepName : local.empty_raw_and_structured_data.StepName
     }
   }
 
-  empty_landing_processing_raw_structured_and_curated_data = {
-    "StepName" : "Empty Landing Processing, Raw, Structured and Curated Data",
+  empty_landing_processing_raw_and_structured_data = {
+    "StepName" : "Empty Landing Processing, Raw, Structured and Structured Data",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
-          "--dpr.file.deletion.buckets" : "${var.s3_landing_processing_bucket_id},${var.s3_raw_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+          "--dpr.file.deletion.buckets" : "${var.s3_landing_processing_bucket_id},${var.s3_raw_bucket_id},${var.s3_structured_bucket_id}",
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
@@ -347,15 +347,15 @@ locals {
     }
   }
 
-  empty_raw_structured_and_curated_data = {
-    "StepName" : "Empty Raw, Structured and Curated Data",
+  empty_raw_and_structured_data = {
+    "StepName" : "Empty Raw, Structured and Structured Data",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
-          "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+          "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_structured_bucket_id}",
           "--dpr.config.key" : var.domain
         }
       },
@@ -602,32 +602,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_maintenance_jobs.StepName
-    }
-  }
-
-  run_maintenance_jobs = {
-    "StepName" : "Compact",
-    "StepDefinition" : {
-      "Type" : "Parallel",
-      "InputPath" : "$",
-      "OutputPath" : "$",
-      "ResultPath" : "$.ParallelResultPath",
-      "Next" : local.post_maintenance.StepName,
-      "Branches" : [
-        {
-          "StartAt" : "Run Compaction Job on Structured Zone",
-          "States" : {
-            (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-          }
-        },
-        {
-          "StartAt" : "Run Compaction Job on Curated Zone",
-          "States" : {
-            (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-          }
-        }
-      ]
+      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_compaction_job_on_structured_zone.StepName
     }
   }
 
@@ -635,7 +610,7 @@ locals {
     "StepName" : "Post Maintenance",
     "StepDefinition" : {
       "Type" : "Pass",
-      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
+      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_structured.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
     }
   }
 
@@ -655,27 +630,7 @@ locals {
         "NumberOfWorkers" : var.compaction_job_num_workers,
         "WorkerType" : var.compaction_job_worker_type
       },
-      "End" : true
-    }
-  }
-
-  run_compaction_job_on_curated_zone = {
-    "StepName" : "Run Compaction Job on Curated Zone",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_maintenance_compaction_job,
-        "Arguments" : {
-          "--dpr.maintenance.root.path" : var.s3_curated_path,
-          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain
-        },
-        "NumberOfWorkers" : var.compaction_job_num_workers,
-        "WorkerType" : var.compaction_job_worker_type
-      },
-      "End" : true
+      "Next" : local.post_maintenance.StepName
     }
   }
 
@@ -718,7 +673,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.switch_hive_tables_for_prisons_to_curated.StepName
+      "Next" : local.switch_hive_tables_for_prisons_to_structured.StepName
     }
   }
 
@@ -737,19 +692,19 @@ locals {
         "NumberOfWorkers" : var.glue_reconciliation_job_num_workers,
         "WorkerType" : var.glue_reconciliation_job_worker_type
       },
-      "Next" : local.switch_hive_tables_for_prisons_to_curated.StepName
+      "Next" : local.switch_hive_tables_for_prisons_to_structured.StepName
     }
   }
 
-  switch_hive_tables_for_prisons_to_curated = {
-    "StepName" : "Switch Hive Tables for Prisons to Curated",
+  switch_hive_tables_for_prisons_to_structured = {
+    "StepName" : "Switch Hive Tables for Prisons to Structured",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
         "JobName" : var.glue_switch_prisons_hive_data_location_job,
         "Arguments" : {
-          "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
+          "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_structured_bucket_id}",
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
