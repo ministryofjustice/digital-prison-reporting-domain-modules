@@ -22,86 +22,37 @@ module "maintenance_pipeline" {
               "--dpr.stop.glue.instance.job.name" : var.glue_reporting_hub_cdc_jobname
             }
           },
-          "Next" : "Compact And Vacuum"
+          "Next" : "Run Compaction Job on Structured Zone"
         },
-        "Compact And Vacuum" : {
-          "Type" : "Parallel",
-          "InputPath" : "$",
-          "OutputPath" : "$",
-          "ResultPath" : "$.ParallelResultPath",
-          "Next" : "Start Glue Streaming Job",
-          "Branches" : [
-            {
-              "StartAt" : "Run Compaction Job on Structured Zone",
-              "States" : {
-                "Run Compaction Job on Structured Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_compaction_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_structured_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.compaction_job_num_workers,
-                    "WorkerType" : var.compaction_job_worker_type
-                  },
-                  "Next" : "Run Vacuum Job on Structured Zone"
-                },
-                "Run Vacuum Job on Structured Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_retention_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_structured_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.retention_job_num_workers,
-                    "WorkerType" : var.retention_job_worker_type
-                  },
-                  "End" : true
-                }
-              }
+        "Run Compaction Job on Structured Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_compaction_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_structured_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
             },
-            {
-              "StartAt" : "Run Compaction Job on Curated Zone",
-              "States" : {
-                "Run Compaction Job on Curated Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_compaction_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_curated_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.compaction_job_num_workers,
-                    "WorkerType" : var.compaction_job_worker_type
-                  },
-                  "Next" : "Run Vacuum Job on Curated Zone"
-                },
-                "Run Vacuum Job on Curated Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_retention_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_curated_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.retention_job_num_workers,
-                    "WorkerType" : var.retention_job_worker_type
-                  },
-                  "End" : true
-                }
-              }
-            }
-          ]
+            "NumberOfWorkers" : var.compaction_job_num_workers,
+            "WorkerType" : var.compaction_job_worker_type
+          },
+          "Next" : "Run Vacuum Job on Structured Zone"
+        },
+        "Run Vacuum Job on Structured Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_retention_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_structured_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            },
+            "NumberOfWorkers" : var.retention_job_num_workers,
+            "WorkerType" : var.retention_job_worker_type
+          },
+          "Next" : "Start Glue Streaming Job"
         },
         "Start Glue Streaming Job" : {
           "Type" : "Task",

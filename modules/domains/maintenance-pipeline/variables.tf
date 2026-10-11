@@ -60,11 +60,6 @@ variable "s3_structured_path" {
   type        = string
 }
 
-variable "s3_curated_path" {
-  description = "S3 Path for Curated Data"
-  type        = string
-}
-
 variable "glue_unprocessed_raw_files_check_job" {
   description = "Name of job to ensure raw files have been processed"
   type        = string
