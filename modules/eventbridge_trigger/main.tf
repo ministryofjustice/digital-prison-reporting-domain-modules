@@ -1,9 +1,12 @@
 resource "aws_scheduler_schedule" "schedule" {
   count = var.create_eventbridge_schedule ? 1 : 0
 
+  kms_key_arn = var.kms_key_arn
+
   state       = var.enable_eventbridge_schedule ? "ENABLED" : "DISABLED"
   name        = var.eventbridge_trigger_name
   description = var.description
+
   flexible_time_window {
     mode                      = var.time_window_mode
     maximum_window_in_minutes = var.time_window_mode == "OFF" ? null : var.maximum_window_in_minutes

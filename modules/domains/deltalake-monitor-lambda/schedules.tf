@@ -52,6 +52,8 @@ module "deltalake_monitor_schedule" {
   schedule_expression          = each.value.schedule_expression
   schedule_expression_timezone = each.value.timezone
 
+  kms_key_arn = var.scheduler_kms_key_arn
+
   arn      = module.deltalake_monitor_lambda.lambda_function
   role_arn = aws_iam_role.scheduler_invocation[0].arn
   # Payload is: {"domain": <key>, "target_size_bytes": <value>}

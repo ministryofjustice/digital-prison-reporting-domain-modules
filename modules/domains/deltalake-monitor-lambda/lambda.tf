@@ -96,6 +96,7 @@ resource "aws_iam_policy" "dms_describe" {
 #   - S3: write the markdown reports
 #   - CloudWatch Logs Insights: find the worst tables in recent monitor-mode logs
 resource "aws_iam_policy" "report_modes" {
+  #checkov:skip=CKV_AWS_355: "logs:GetQueryResults and logs:StopQuery do not support resource-level permissions — AWS requires Resource: '*' for these actions"
   count = var.enable ? 1 : 0
 
   name = local.report_modes_policy_name
