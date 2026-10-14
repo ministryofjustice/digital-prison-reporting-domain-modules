@@ -96,6 +96,7 @@ resource "aws_iam_policy" "dms_describe" {
 #   - S3: write the markdown reports
 #   - CloudWatch Logs Insights: find the worst tables in recent monitor-mode logs
 resource "aws_iam_policy" "report_modes" {
+  #checkov:skip=CKV_AWS_355: "logs:GetQueryResults and logs:StopQuery do not support resource-level permissions — AWS requires Resource: '*' for these actions"
   count = var.enable ? 1 : 0
 
   name = local.report_modes_policy_name
@@ -179,6 +180,8 @@ module "deltalake_monitor_lambda" {
     REPORT_S3_BUCKET  = var.report_s3_bucket_name
     MONITOR_LOG_GROUP = local.monitor_log_group
     BEDROCK_MODEL_ID  = var.bedrock_model_id
+    # Must match the 'service' dimension on CloudWatch metrics so alarms target the right series
+    POWERTOOLS_SERVICE_NAME = var.powertools_service_name
   }
 
   log_retention_in_days = var.lambda_log_retention_in_days
