@@ -179,6 +179,8 @@ module "deltalake_monitor_lambda" {
     REPORT_S3_BUCKET  = var.report_s3_bucket_name
     MONITOR_LOG_GROUP = local.monitor_log_group
     BEDROCK_MODEL_ID  = var.bedrock_model_id
+    # Must match the 'service' dimension on CloudWatch metrics so alarms target the right series
+    POWERTOOLS_SERVICE_NAME = var.powertools_service_name
   }
 
   log_retention_in_days = var.lambda_log_retention_in_days
