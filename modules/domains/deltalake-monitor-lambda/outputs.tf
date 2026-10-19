@@ -16,3 +16,8 @@ output "domain_schedule_arns" {
   description = "Map of domain name to the ARN of its EventBridge schedule."
   value       = { for k, m in module.deltalake_monitor_schedule : k => m.schedule_arn }
 }
+
+output "slack_alerts_sns_topic_arn" {
+  description = "ARN of the existing SNS topic used for Delta Lake Monitor alerts."
+  value       = var.slack_alerts_sns_topic_arn
+}

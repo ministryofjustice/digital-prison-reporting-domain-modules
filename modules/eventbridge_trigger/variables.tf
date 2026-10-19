@@ -57,3 +57,9 @@ variable "input" {
   type        = string
   description = "The input string of eventbridge target"
 }
+
+variable "kms_key_arn" {
+  description = "ARN of the customer-managed KMS key used to encrypt EventBridge Scheduler data."
+  type        = string
+  default     = null
+}
