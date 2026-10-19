@@ -16,8 +16,6 @@ locals {
       service = var.powertools_service_name
     }
   }
-
-  effective_sns_topic_arn = var.slack_alerts_sns_topic_arn
 }
 
 module "max_compaction_debt_alarms" {
@@ -38,12 +36,7 @@ module "max_compaction_debt_alarms" {
 
   thresholds    = local.domain_compaction_debt_thresholds
   dimensions    = local.domain_compaction_debt_dimensions
-  sns_topic_arn = local.effective_sns_topic_arn
+  sns_topic_arn = var.slack_alerts_sns_topic_arn
 
   tags = merge(var.tags, { alarm_type = "max-compaction-debt" })
-}
-
-moved {
-  from = aws_cloudwatch_metric_alarm.max_compaction_debt
-  to   = module.max_compaction_debt_alarms.aws_cloudwatch_metric_alarm.this
 }

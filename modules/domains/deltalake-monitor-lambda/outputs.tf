@@ -19,5 +19,5 @@ output "domain_schedule_arns" {
 
 output "slack_alerts_sns_topic_arn" {
   description = "ARN of the existing SNS topic used for Delta Lake Monitor alerts."
-  value       = local.effective_sns_topic_arn
+  value       = var.slack_alerts_sns_topic_arn
 }
