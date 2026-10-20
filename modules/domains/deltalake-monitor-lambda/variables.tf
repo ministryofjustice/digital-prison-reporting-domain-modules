@@ -153,10 +153,6 @@ variable "domain_schedules" {
     target_size_bytes   = number
     enabled             = optional(bool, true)
     timezone            = optional(string, "UTC")
-    alert_thresholds = optional(object({
-      max_compaction_debt = optional(number)
-      # Future: max_active_file_count = optional(number)
-    }), {})
   }))
   default = {}
 
@@ -169,28 +165,4 @@ variable "domain_schedules" {
     condition     = alltrue([for d in values(var.domain_schedules) : d.target_size_bytes > 0])
     error_message = "target_size_bytes must be a positive number for every domain."
   }
-}
-
-variable "default_max_compaction_debt_alert_threshold" {
-  description = "Default CloudWatch Alarm threshold for MaxCompactionDebt. A domain's alert_thresholds.max_compaction_debt overrides this. Set to null to disable alarms globally."
-  type        = number
-  default     = 1000
-}
-
-variable "slack_alerts_sns_topic_arn" {
-  description = "ARN of the existing SNS topic for Delta Lake Monitor alerts."
-  type        = string
-  default     = null
-}
-
-variable "powertools_service_name" {
-  description = "Value of POWERTOOLS_SERVICE_NAME env var on the lambda. Used as the 'service' dimension on CloudWatch metrics so alarms target the right series."
-  type        = string
-  default     = "deltalake-monitor"
-}
-
-variable "scheduler_kms_key_arn" {
-  description = "ARN of the customer-managed KMS key used to encrypt EventBridge Scheduler data. Required to satisfy CKV_AWS_297. Set to null to use the AWS-managed key (not recommended for production)."
-  type        = string
-  default     = null
 }
