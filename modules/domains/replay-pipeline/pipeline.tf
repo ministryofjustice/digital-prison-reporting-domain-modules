@@ -1,3 +1,7 @@
+locals {
+  glue_switch_hive_data_location_job = var.glue_switch_reporting_hive_data_location_job != null ? var.glue_switch_reporting_hive_data_location_job : var.glue_switch_prisons_hive_data_location_job
+}
+
 # Replay Pipeline Step Function
 module "replay_pipeline" {
   source = "../../step_function"
@@ -87,15 +91,16 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Switch Hive Tables for Prisons to Temp-Reload Bucket"
+          "Next" : "Switch Hive Tables to Temp-Reload Bucket"
         },
-        "Switch Hive Tables for Prisons to Temp-Reload Bucket" : {
+        "Switch Hive Tables to Temp-Reload Bucket" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : var.glue_switch_prisons_hive_data_location_job,
+            "JobName" : local.glue_switch_hive_data_location_job,
             "Arguments" : {
-              "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
+              "--dpr.reporting.database" : module.parent_domain.reporting_database,
+              "--dpr.reporting.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },
@@ -278,15 +283,16 @@ module "replay_pipeline" {
             "ReplicationTaskArn" : var.dms_replication_task_arn,
             "StartReplicationTaskType" : "resume-processing"
           },
-          "Next" : "Switch Hive Tables for Prisons to Curated"
+          "Next" : "Switch Hive Tables to Curated"
         },
-        "Switch Hive Tables for Prisons to Curated" : {
+        "Switch Hive Tables to Curated" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
-            "JobName" : var.glue_switch_prisons_hive_data_location_job,
+            "JobName" : local.glue_switch_hive_data_location_job,
             "Arguments" : {
-              "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
+              "--dpr.reporting.database" : module.parent_domain.reporting_database,
+              "--dpr.reporting.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
               "--dpr.config.key" : var.domain
             }
           },

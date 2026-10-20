@@ -18,7 +18,7 @@ module "reload_pipeline" {
         (local.update_hive_tables.StepName) : local.update_hive_tables.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_landing_processing_raw_structured_and_curated_data.StepName) : local.empty_landing_processing_raw_structured_and_curated_data.StepDefinition,
         (local.invoke_landing_zone_antivirus_check_lambda.StepName) : local.invoke_landing_zone_antivirus_check_lambda.StepDefinition,
         (local.invoke_landing_zone_processing_lambda.StepName) : local.invoke_landing_zone_processing_lambda.StepDefinition,
@@ -27,7 +27,7 @@ module "reload_pipeline" {
         (local.empty_raw_data.StepName) : local.empty_raw_data.StepDefinition,
         (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
@@ -40,7 +40,7 @@ module "reload_pipeline" {
         (local.update_hive_tables.StepName) : local.update_hive_tables.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
         (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
@@ -50,7 +50,7 @@ module "reload_pipeline" {
         (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
@@ -67,7 +67,7 @@ module "reload_pipeline" {
         (local.update_hive_tables.StepName) : local.update_hive_tables.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
         (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
@@ -77,7 +77,7 @@ module "reload_pipeline" {
         (local.empty_raw_data.StepName) : local.empty_raw_data.StepDefinition,
         (local.start_dms_cdc_replication_task.StepName) : local.start_dms_cdc_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.reactivate_archive_trigger.StepName) : local.reactivate_archive_trigger.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
@@ -95,7 +95,7 @@ module "reload_pipeline" {
         (local.update_hive_tables.StepName) : local.update_hive_tables.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
         (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
@@ -106,7 +106,7 @@ module "reload_pipeline" {
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.resume_dms_replication_task.StepName) : local.resume_dms_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.reactivate_archive_trigger.StepName) : local.reactivate_archive_trigger.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
@@ -143,7 +143,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.move_backfilled_data_to_archive_bucket.StepName) : local.move_backfilled_data_to_archive_bucket.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
         (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
@@ -153,7 +153,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
@@ -174,7 +174,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.move_backfilled_data_to_archive_bucket.StepName) : local.move_backfilled_data_to_archive_bucket.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
         (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
@@ -184,7 +184,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.empty_raw_data.StepName) : local.empty_raw_data.StepDefinition,
         (local.start_dms_cdc_replication_task.StepName) : local.start_dms_cdc_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.reactivate_archive_trigger.StepName) : local.reactivate_archive_trigger.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
@@ -206,7 +206,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.move_backfilled_data_to_archive_bucket.StepName) : local.move_backfilled_data_to_archive_bucket.StepDefinition,
         (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
         (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_to_temp_reload_bucket.StepName) : local.switch_hive_tables_to_temp_reload_bucket.StepDefinition,
         (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
         (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
@@ -217,7 +217,7 @@ module "reload_pipeline_with_archive_backfill" {
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.resume_dms_replication_task.StepName) : local.resume_dms_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
-        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
         (local.reactivate_archive_trigger.StepName) : local.reactivate_archive_trigger.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
