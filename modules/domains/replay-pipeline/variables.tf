@@ -79,9 +79,23 @@ variable "glue_s3_file_transfer_job" {
 }
 
 variable "glue_switch_prisons_hive_data_location_job" {
-  description = "Name of glue job to switch the prisons hive data location"
+  description = "Old name for glue_switch_reporting_hive_data_location_job, used when that isn't set"
   type        = string
   default     = ""
+}
+
+variable "glue_switch_reporting_hive_data_location_job" {
+  description = "Name of glue job to switch a domain's tables in its reporting database to another data location"
+  type        = string
+  default     = null
+}
+
+variable "parent_domain" {
+  description = "The domain's parent domain, prisons or probation, which decides the Glue databases its tables are created in"
+  type        = string
+  nullable    = false
+  # Defaults to prisons only until every domain sets it
+  default = "prisons"
 }
 
 variable "glue_s3_data_deletion_job" {

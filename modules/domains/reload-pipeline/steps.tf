@@ -1,4 +1,6 @@
 locals {
+  glue_switch_hive_data_location_job = var.glue_switch_reporting_hive_data_location_job != null ? var.glue_switch_reporting_hive_data_location_job : var.glue_switch_prisons_hive_data_location_job
+
   deactivate_archive_trigger = {
     "StepName" : "Deactivate Archive Trigger",
     "StepDefinition" : {
@@ -107,6 +109,8 @@ locals {
       "Parameters" : {
         "JobName" : var.glue_hive_table_creation_jobname,
         "Arguments" : {
+          "--dpr.raw_archive.database" : module.parent_domain.raw_archive_database,
+          "--dpr.reporting.database" : module.parent_domain.reporting_database,
           "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
@@ -227,19 +231,20 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName
+      "Next" : local.switch_hive_tables_to_temp_reload_bucket.StepName
     }
   }
 
-  switch_hive_tables_for_prisons_to_temp_reload_bucket = {
-    "StepName" : "Switch Hive Tables for Prisons to Temp-Reload Bucket",
+  switch_hive_tables_to_temp_reload_bucket = {
+    "StepName" : "Switch Hive Tables to Temp-Reload Bucket",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
-        "JobName" : var.glue_switch_prisons_hive_data_location_job,
+        "JobName" : local.glue_switch_hive_data_location_job,
         "Arguments" : {
-          "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
+          "--dpr.reporting.database" : module.parent_domain.reporting_database,
+          "--dpr.reporting.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
@@ -635,7 +640,7 @@ locals {
     "StepName" : "Post Maintenance",
     "StepDefinition" : {
       "Type" : "Pass",
-      "Next" : var.file_transfer_in ? local.switch_hive_tables_for_prisons_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
+      "Next" : var.file_transfer_in ? local.switch_hive_tables_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
     }
   }
 
@@ -718,7 +723,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.switch_hive_tables_for_prisons_to_curated.StepName
+      "Next" : local.switch_hive_tables_to_curated.StepName
     }
   }
 
@@ -737,19 +742,20 @@ locals {
         "NumberOfWorkers" : var.glue_reconciliation_job_num_workers,
         "WorkerType" : var.glue_reconciliation_job_worker_type
       },
-      "Next" : local.switch_hive_tables_for_prisons_to_curated.StepName
+      "Next" : local.switch_hive_tables_to_curated.StepName
     }
   }
 
-  switch_hive_tables_for_prisons_to_curated = {
-    "StepName" : "Switch Hive Tables for Prisons to Curated",
+  switch_hive_tables_to_curated = {
+    "StepName" : "Switch Hive Tables to Curated",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
-        "JobName" : var.glue_switch_prisons_hive_data_location_job,
+        "JobName" : local.glue_switch_hive_data_location_job,
         "Arguments" : {
-          "--dpr.prisons.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
+          "--dpr.reporting.database" : module.parent_domain.reporting_database,
+          "--dpr.reporting.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
