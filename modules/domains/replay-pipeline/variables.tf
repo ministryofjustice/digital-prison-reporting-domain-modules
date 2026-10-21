@@ -126,12 +126,6 @@ variable "s3_structured_bucket_id" {
   default     = ""
 }
 
-variable "s3_curated_bucket_id" {
-  description = "S3, Curated Bucket ID"
-  type        = string
-  default     = ""
-}
-
 variable "s3_temp_reload_bucket_id" {
   description = "S3 Bucket ID for the temporary location to store reload data"
   type        = string
@@ -145,11 +139,6 @@ variable "glue_maintenance_compaction_job" {
 
 variable "s3_structured_path" {
   description = "S3 Path for Structured Data"
-  type        = string
-}
-
-variable "s3_curated_path" {
-  description = "S3 Path for Curated Data"
   type        = string
 }
 

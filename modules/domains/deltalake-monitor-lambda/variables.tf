@@ -28,8 +28,8 @@ variable "lambda_code_s3_key" {
   type        = string
 }
 
-variable "curated_bucket_name" {
-  description = "The name of the curated bucket that this lambda reads Delta Lake table data/metadata from, e.g. to calculate table metrics"
+variable "structured_bucket_name" {
+  description = "The name of the structured bucket that this lambda reads Delta Lake table data/metadata from, e.g. to calculate table metrics"
   type        = string
 }
 
