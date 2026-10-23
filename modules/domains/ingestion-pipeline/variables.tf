@@ -239,29 +239,16 @@ variable "glue_hive_table_creation_jobname" {
   type        = string
 }
 
-variable "glue_switch_prisons_hive_data_location_job" {
-  description = "Old name for glue_switch_reporting_hive_data_location_job, used when that isn't set"
-  type        = string
-  default     = null
-}
-
 variable "glue_switch_reporting_hive_data_location_job" {
   description = "Name of glue job to switch a domain's tables in its reporting database to another data location"
   type        = string
-  default     = null
-
-  validation {
-    condition     = var.glue_switch_reporting_hive_data_location_job != null || var.glue_switch_prisons_hive_data_location_job != null
-    error_message = "Set glue_switch_reporting_hive_data_location_job to the name of the switch Hive tables Glue job"
-  }
+  nullable    = false
 }
 
 variable "parent_domain" {
   description = "The domain's parent domain, prisons or probation, which decides the Glue databases its tables are created in"
   type        = string
   nullable    = false
-  # Defaults to prisons only until every domain sets it
-  default = "prisons"
 }
 
 variable "glue_maintenance_compaction_job" {
