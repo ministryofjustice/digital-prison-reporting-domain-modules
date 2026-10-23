@@ -1,6 +1,4 @@
 locals {
-  glue_switch_hive_data_location_job = var.glue_switch_reporting_hive_data_location_job != null ? var.glue_switch_reporting_hive_data_location_job : var.glue_switch_prisons_hive_data_location_job
-
   deactivate_archive_trigger = {
     "StepName" : "Deactivate Archive Trigger",
     "StepDefinition" : {
@@ -145,7 +143,7 @@ locals {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
-        "JobName" : local.glue_switch_hive_data_location_job,
+        "JobName" : var.glue_switch_reporting_hive_data_location_job,
         "Arguments" : {
           "--dpr.reporting.database" : module.parent_domain.reporting_database,
           "--dpr.reporting.data.switch.target.s3.path" : "s3://${var.s3_temp_reload_bucket_id}",
@@ -517,7 +515,7 @@ locals {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
-        "JobName" : local.glue_switch_hive_data_location_job,
+        "JobName" : var.glue_switch_reporting_hive_data_location_job,
         "Arguments" : {
           "--dpr.reporting.database" : module.parent_domain.reporting_database,
           "--dpr.reporting.data.switch.target.s3.path" : "s3://${var.s3_curated_bucket_id}",
