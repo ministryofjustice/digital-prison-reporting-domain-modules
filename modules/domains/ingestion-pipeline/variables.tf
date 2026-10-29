@@ -189,11 +189,6 @@ variable "s3_raw_archive_bucket_id" {
   type        = string
 }
 
-variable "s3_structured_bucket_id" {
-  description = "S3, Structured Bucket ID"
-  type        = string
-}
-
 variable "s3_curated_bucket_id" {
   description = "S3, Curated Bucket ID"
   type        = string
@@ -253,11 +248,6 @@ variable "parent_domain" {
 
 variable "glue_maintenance_compaction_job" {
   description = "Name of glue job which compacts the delta tables"
-  type        = string
-}
-
-variable "s3_structured_path" {
-  description = "S3 Path for Structured Data"
   type        = string
 }
 

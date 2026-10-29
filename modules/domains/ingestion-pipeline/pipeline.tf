@@ -151,19 +151,19 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_structured_and_curated_data.StepName : local.empty_raw_archive_structured_and_curated_data.StepName
+      "Next" : var.file_transfer_in ? local.empty_landing_processing_raw_archive_curated_data.StepName : local.empty_raw_archive_curated_data.StepName
     }
   }
 
-  empty_raw_archive_structured_and_curated_data = {
-    "StepName" : "Empty Raw, Archive, Structured and Curated Data",
+  empty_raw_archive_curated_data = {
+    "StepName" : "Empty Raw, Archive, Curated Data",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
-          "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+          "--dpr.file.deletion.buckets" : "${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_curated_bucket_id}",
           "--dpr.config.key" : var.domain
         }
       },
@@ -171,15 +171,15 @@ locals {
     }
   }
 
-  empty_landing_processing_raw_archive_structured_and_curated_data = {
-    "StepName" : "Empty Landing Processing, Raw, Archive, Structured and Curated Data",
+  empty_landing_processing_raw_archive_curated_data = {
+    "StepName" : "Empty Landing Processing, Raw, Archive, Curated Data",
     "StepDefinition" : {
       "Type" : "Task",
       "Resource" : "arn:aws:states:::glue:startJobRun.sync",
       "Parameters" : {
         "JobName" : var.glue_s3_data_deletion_job,
         "Arguments" : {
-          "--dpr.file.deletion.buckets" : "${var.s3_landing_processing_bucket_id},${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+          "--dpr.file.deletion.buckets" : "${var.s3_landing_processing_bucket_id},${var.s3_raw_bucket_id},${var.s3_raw_archive_bucket_id},${var.s3_curated_bucket_id}",
           "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
           "--dpr.config.key" : var.domain
         }
@@ -369,32 +369,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_maintenance_jobs.StepName
-    }
-  }
-
-  run_maintenance_jobs = {
-    "StepName" : "Compact",
-    "StepDefinition" : {
-      "Type" : "Parallel",
-      "InputPath" : "$",
-      "OutputPath" : "$",
-      "ResultPath" : "$.ParallelResultPath",
-      "Next" : local.post_maintenance.StepName,
-      "Branches" : [
-        {
-          "StartAt" : "Run Compaction Job on Structured Zone",
-          "States" : {
-            (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition
-          }
-        },
-        {
-          "StartAt" : "Run Compaction Job on Curated Zone",
-          "States" : {
-            (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition
-          }
-        }
-      ]
+      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_compaction_job_on_curated_zone.StepName
     }
   }
 
@@ -403,27 +378,6 @@ locals {
     "StepDefinition" : {
       "Type" : "Pass",
       "Next" : var.file_transfer_in ? local.switch_hive_tables_to_curated.StepName : (var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName)
-    }
-  }
-
-  run_compaction_job_on_structured_zone = {
-    "StepName" : "Run Compaction Job on Structured Zone",
-    "StepDefinition" : {
-      "Type" : "Task",
-      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters" : {
-        "JobName" : var.glue_maintenance_compaction_job,
-        "Arguments" : {
-          "--dpr.maintenance.root.path" : var.s3_structured_path,
-          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-          "--dpr.read.config.from.s3" : tostring(var.file_transfer_in),
-          "--dpr.config.key" : var.domain,
-          "--dpr.maintenance.full.compaction" : "false"
-        },
-        "NumberOfWorkers" : var.compaction_job_num_workers,
-        "WorkerType" : var.compaction_job_worker_type
-      },
-      "End" : true
     }
   }
 
@@ -584,7 +538,7 @@ module "data_ingestion_pipeline" {
       (local.invoke_landing_zone_processing_lambda.StepName) : local.invoke_landing_zone_processing_lambda.StepDefinition,
       (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
       (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-      (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
+      (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
       (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
       (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
       (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
@@ -604,7 +558,7 @@ module "data_ingestion_pipeline" {
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
         (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
         (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-        (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
+        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
         (local.switch_hive_tables_to_curated.StepName) : local.switch_hive_tables_to_curated.StepDefinition,
@@ -655,7 +609,7 @@ module "data_ingestion_pipeline" {
         (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
         (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
         (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-        (local.run_maintenance_jobs.StepName) : local.run_maintenance_jobs.StepDefinition,
+        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
         (local.post_maintenance.StepName) : local.post_maintenance.StepDefinition,
         (local.resume_dms_replication_task.StepName) : local.resume_dms_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,

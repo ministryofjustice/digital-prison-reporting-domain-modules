@@ -55,11 +55,6 @@ variable "s3_glue_bucket_id" {
   type        = string
 }
 
-variable "s3_structured_path" {
-  description = "S3 Path for Structured Data"
-  type        = string
-}
-
 variable "s3_curated_path" {
   description = "S3 Path for Curated Data"
   type        = string
