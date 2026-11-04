@@ -1,5 +1,5 @@
 locals {
-  # structured and curated are shared by every parent domain, so only these vary
+  # curated are shared by every parent domain, so only these vary
   databases = {
     prisons = {
       raw_archive = "raw_archive"

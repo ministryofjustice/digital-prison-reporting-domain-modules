@@ -100,15 +100,15 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Empty Structured and Curated Data"
+          "Next" : "Empty Curated Data"
         },
-        "Empty Structured and Curated Data" : {
+        "Empty Curated Data" : {
           "Type" : "Task",
           "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_s3_data_deletion_job,
             "Arguments" : {
-              "--dpr.file.deletion.buckets" : "${var.s3_structured_bucket_id},${var.s3_curated_bucket_id}",
+              "--dpr.file.deletion.buckets" : var.s3_curated_bucket_id,
               "--dpr.config.key" : var.domain
             }
           },
@@ -166,56 +166,22 @@ module "replay_pipeline" {
               "--dpr.config.key" : var.domain
             }
           },
-          "Next" : "Compact"
+          "Next" : "Run Compaction Job on Curated Zone"
         },
-        "Compact" : {
-          "Type" : "Parallel",
-          "InputPath" : "$",
-          "OutputPath" : "$",
-          "ResultPath" : "$.ParallelResultPath",
-          "Next" : "Proceed To Streaming Process",
-          "Branches" : [
-            {
-              "StartAt" : "Run Compaction Job on Structured Zone",
-              "States" : {
-                "Run Compaction Job on Structured Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_compaction_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_structured_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.compaction_job_num_workers,
-                    "WorkerType" : var.compaction_job_worker_type
-                  },
-                  "End" : true
-                }
-              }
+        "Run Compaction Job on Curated Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_compaction_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_curated_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
             },
-            {
-              "StartAt" : "Run Compaction Job on Curated Zone",
-              "States" : {
-                "Run Compaction Job on Curated Zone" : {
-                  "Type" : "Task",
-                  "Resource" : "arn:aws:states:::glue:startJobRun.sync",
-                  "Parameters" : {
-                    "JobName" : var.glue_maintenance_compaction_job,
-                    "Arguments" : {
-                      "--dpr.maintenance.root.path" : var.s3_curated_path,
-                      "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-                      "--dpr.config.key" : var.domain
-                    },
-                    "NumberOfWorkers" : var.compaction_job_num_workers,
-                    "WorkerType" : var.compaction_job_worker_type
-                  },
-                  "End" : true
-                }
-              }
-            }
-          ]
+            "NumberOfWorkers" : var.compaction_job_num_workers,
+            "WorkerType" : var.compaction_job_worker_type
+          },
+          "Next" : "Proceed To Streaming Process"
         },
         "Proceed To Streaming Process" : {
           "Type" : "Pass",
